@@ -2,21 +2,7 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --foreground: #0f172a;
 }
 
 body {
@@ -24,3 +10,174 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+input, textarea, select {
+  color: #0f172a;
+}
+
+/* 3D Perspective and Floating Keyframe Animations */
+@keyframes floatSlow {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-16px) rotate(3deg);
+  }
+}
+
+@keyframes floatReverse {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(16px) rotate(-3deg);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.65;
+    transform: scale(1.15);
+  }
+}
+
+@keyframes rotate3dSlow {
+  0% {
+    transform: perspective(1000px) rotateX(14deg) rotateY(-14deg) rotateZ(0deg);
+  }
+  50% {
+    transform: perspective(1000px) rotateX(6deg) rotateY(14deg) rotateZ(4deg) translateY(-12px);
+  }
+  100% {
+    transform: perspective(1000px) rotateX(14deg) rotateY(-14deg) rotateZ(0deg);
+  }
+}
+
+@keyframes floatOrb1 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(30px, -40px) scale(1.1);
+  }
+  66% {
+    transform: translate(-25px, 20px) scale(0.95);
+  }
+}
+
+@keyframes floatOrb2 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(-35px, 30px) scale(1.08);
+  }
+  66% {
+    transform: translate(25px, -35px) scale(0.92);
+  }
+}
+
+.animate-float-orb1 {
+  animation: floatOrb1 16s ease-in-out infinite;
+}
+
+.animate-float-orb2 {
+  animation: floatOrb2 18s ease-in-out infinite;
+}
+
+.animate-float-slow {
+  animation: floatSlow 7s ease-in-out infinite;
+}
+
+.animate-float-reverse {
+  animation: floatReverse 8s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 6s ease-in-out infinite;
+}
+
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.transform-3d {
+  transform-style: preserve-3d;
+}
+
+.animate-rotate-3d {
+  animation: rotate3dSlow 10s ease-in-out infinite;
+}
+
+/* Dark Mode Overrides for Dashboard */
+.dark-theme {
+  color-scheme: dark;
+}
+
+.dark-theme .dashboard-bg {
+  background-color: #0b0f19 !important;
+  color: #f1f5f9 !important;
+}
+
+.dark-theme .dashboard-header,
+.dark-theme .dashboard-sidebar {
+  background-color: #111827 !important;
+  border-color: #1f2937 !important;
+  color: #f1f5f9 !important;
+}
+
+.dark-theme .dashboard-card {
+  background-color: #111827 !important;
+  border-color: #1f2937 !important;
+  color: #f1f5f9 !important;
+}
+
+.dark-theme .dashboard-subcard {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+.dark-theme .dashboard-text-main {
+  color: #f8fafc !important;
+}
+
+.dark-theme .dashboard-text-muted {
+  color: #94a3b8 !important;
+}
+
+.dark-theme .dashboard-input {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #ffffff !important;
+}
+
+.dark-theme .dashboard-input::placeholder {
+  color: #64748b !important;
+}
+
+.dark-theme table,
+.dark-theme thead,
+.dark-theme tr {
+  border-color: #1f2937 !important;
+}
+
+.dark-theme th {
+  background-color: #1e293b !important;
+  color: #cbd5e1 !important;
+}
+
+.dark-theme td {
+  border-color: #1f2937 !important;
+  color: #e2e8f0 !important;
+}
+
+.dark-theme tr:hover td {
+  background-color: #1e293b50 !important;
+}
+
+
