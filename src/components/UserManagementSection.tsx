@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import {
   Plus,
   Pencil,
@@ -31,6 +32,7 @@ interface UserItem {
   phone: string | null;
   role: "GURU" | "MURID" | "ADMIN" | "SUPERADMIN";
   kelas?: string | null;
+  image?: string | null;
   createdAt: string;
   _count?: {
     attendances: number;
@@ -306,7 +308,7 @@ export default function UserManagementSection({ initialUsers, currentUserRole = 
                   setCurrentPage(1);
                 }}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
-                  filterRole === "ADMIN" ? "bg-white text-indigo-700 shadow-2xs" : "text-slate-600 hover:text-slate-800"
+                  filterRole === "ADMIN" ? "bg-white text-emerald-800 shadow-2xs font-bold" : "text-slate-600 hover:text-slate-800"
                 }`}
               >
                 Admin ({users.filter((u) => u.role === "ADMIN").length})
@@ -318,7 +320,7 @@ export default function UserManagementSection({ initialUsers, currentUserRole = 
                 setCurrentPage(1);
               }}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
-                filterRole === "GURU" ? "bg-white text-indigo-700 shadow-2xs" : "text-slate-600 hover:text-slate-800"
+                filterRole === "GURU" ? "bg-white text-emerald-800 shadow-2xs font-bold" : "text-slate-600 hover:text-slate-800"
               }`}
             >
               Guru ({users.filter((u) => u.role === "GURU").length})
@@ -329,7 +331,7 @@ export default function UserManagementSection({ initialUsers, currentUserRole = 
                 setCurrentPage(1);
               }}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
-                filterRole === "MURID" ? "bg-white text-indigo-700 shadow-2xs" : "text-slate-600 hover:text-slate-800"
+                filterRole === "MURID" ? "bg-white text-emerald-800 shadow-2xs font-bold" : "text-slate-600 hover:text-slate-800"
               }`}
             >
               Murid ({users.filter((u) => u.role === "MURID").length})
@@ -363,7 +365,7 @@ export default function UserManagementSection({ initialUsers, currentUserRole = 
           <button
             type="button"
             onClick={handleOpenAddModal}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition shadow-md shadow-indigo-100"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition shadow-md shadow-emerald-100"
           >
             <Plus className="w-4 h-4" />
             <span>Tambah User</span>
@@ -420,17 +422,28 @@ export default function UserManagementSection({ initialUsers, currentUserRole = 
                   <tr key={u.id} className="hover:bg-slate-50/60 transition">
                     <td className="px-6 py-3.5">
                       <div className="flex items-center gap-3">
-                        <div
-                          className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs ${
-                            u.role === "ADMIN"
-                              ? "bg-blue-100 text-blue-700"
-                              : u.role === "GURU"
-                              ? "bg-emerald-100 text-emerald-700"
-                              : "bg-indigo-100 text-indigo-700"
-                          }`}
-                        >
-                          {u.name ? u.name.charAt(0).toUpperCase() : "U"}
-                        </div>
+                        {u.image ? (
+                          <div className="relative w-9 h-9 rounded-xl overflow-hidden shadow-2xs border border-slate-200 shrink-0">
+                            <Image
+                              src={u.image}
+                              alt={u.name || "Foto Profil"}
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                        ) : (
+                          <div
+                            className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 ${
+                              u.role === "ADMIN"
+                                ? "bg-teal-100 text-teal-800"
+                                : u.role === "GURU"
+                                ? "bg-emerald-100 text-emerald-700"
+                                : "bg-emerald-100 text-emerald-800"
+                            }`}
+                          >
+                            {u.name ? u.name.charAt(0).toUpperCase() : "U"}
+                          </div>
+                        )}
                         <div>
                           <p className="font-bold text-slate-800">{u.name}</p>
                           <p className="text-[11px] text-slate-400">@{u.username || "-"}</p>
@@ -441,10 +454,10 @@ export default function UserManagementSection({ initialUsers, currentUserRole = 
                       <span
                         className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
                           u.role === "ADMIN"
-                            ? "bg-blue-100 text-blue-700 border border-blue-200"
+                            ? "bg-teal-100 text-teal-800 border border-teal-200"
                             : u.role === "GURU"
                             ? "bg-emerald-100 text-emerald-700 border border-emerald-200"
-                            : "bg-indigo-100 text-indigo-700 border border-indigo-200"
+                            : "bg-emerald-100 text-emerald-800 border border-emerald-200"
                         }`}
                       >
                         {u.role === "ADMIN" ? (
@@ -481,7 +494,7 @@ export default function UserManagementSection({ initialUsers, currentUserRole = 
                         <button
                           type="button"
                           onClick={() => handleOpenEditModal(u)}
-                          className="p-1.5 rounded-lg border border-slate-200 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 transition"
+                          className="p-1.5 rounded-lg border border-slate-200 hover:bg-emerald-50 hover:text-emerald-600 text-slate-600 transition"
                           title="Edit Pengguna"
                         >
                           <Pencil className="w-3.5 h-3.5" />
@@ -582,7 +595,7 @@ export default function UserManagementSection({ initialUsers, currentUserRole = 
                     onClick={() => setFormData({ ...formData, role: "MURID" })}
                     className={`py-2 text-xs font-bold rounded-xl border transition ${
                       formData.role === "MURID"
-                        ? "border-indigo-600 bg-indigo-50 text-indigo-700"
+                        ? "border-emerald-600 bg-emerald-50 text-emerald-700 font-bold"
                         : "border-slate-200 bg-white text-slate-600"
                     }`}
                   >
@@ -606,7 +619,7 @@ export default function UserManagementSection({ initialUsers, currentUserRole = 
                       onClick={() => setFormData({ ...formData, role: "ADMIN" })}
                       className={`py-2 text-xs font-bold rounded-xl border transition ${
                         formData.role === "ADMIN"
-                          ? "border-blue-600 bg-blue-50 text-blue-700"
+                          ? "border-teal-600 bg-teal-50 text-teal-700 font-bold"
                           : "border-slate-200 bg-white text-slate-600"
                       }`}
                     >
@@ -624,7 +637,7 @@ export default function UserManagementSection({ initialUsers, currentUserRole = 
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="Contoh: Budi Pratama"
-                  className="w-full px-3.5 py-2.5 text-xs text-slate-900 bg-white placeholder:text-slate-400 font-medium rounded-xl border border-slate-300 focus:outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600"
+                  className="w-full px-3.5 py-2.5 text-xs text-slate-900 bg-white placeholder:text-slate-400 font-medium rounded-xl border border-slate-300 focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
                 />
               </div>
 
@@ -637,7 +650,7 @@ export default function UserManagementSection({ initialUsers, currentUserRole = 
                     value={formData.username}
                     onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                     placeholder="budi_pratama"
-                    className="w-full px-3.5 py-2.5 text-xs text-slate-900 bg-white placeholder:text-slate-400 font-medium rounded-xl border border-slate-300 focus:outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600"
+                    className="w-full px-3.5 py-2.5 text-xs text-slate-900 bg-white placeholder:text-slate-400 font-medium rounded-xl border border-slate-300 focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
                   />
                 </div>
                 <div>
@@ -647,7 +660,7 @@ export default function UserManagementSection({ initialUsers, currentUserRole = 
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     placeholder="081234567890"
-                    className="w-full px-3.5 py-2.5 text-xs text-slate-900 bg-white placeholder:text-slate-400 font-medium rounded-xl border border-slate-300 focus:outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600"
+                    className="w-full px-3.5 py-2.5 text-xs text-slate-900 bg-white placeholder:text-slate-400 font-medium rounded-xl border border-slate-300 focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
                   />
                 </div>
               </div>
@@ -660,7 +673,7 @@ export default function UserManagementSection({ initialUsers, currentUserRole = 
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="budi@example.com"
-                    className="w-full px-3.5 py-2.5 text-xs text-slate-900 bg-white placeholder:text-slate-400 font-medium rounded-xl border border-slate-300 focus:outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600"
+                    className="w-full px-3.5 py-2.5 text-xs text-slate-900 bg-white placeholder:text-slate-400 font-medium rounded-xl border border-slate-300 focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
                   />
                 </div>
                 {formData.role === "MURID" && (
@@ -671,7 +684,7 @@ export default function UserManagementSection({ initialUsers, currentUserRole = 
                       value={formData.kelas}
                       onChange={(e) => setFormData({ ...formData, kelas: e.target.value })}
                       placeholder="XII RPL 1"
-                      className="w-full px-3.5 py-2.5 text-xs text-slate-900 bg-white placeholder:text-slate-400 font-medium rounded-xl border border-slate-300 focus:outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600"
+                      className="w-full px-3.5 py-2.5 text-xs text-slate-900 bg-white placeholder:text-slate-400 font-medium rounded-xl border border-slate-300 focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
                     />
                   </div>
                 )}
@@ -688,7 +701,7 @@ export default function UserManagementSection({ initialUsers, currentUserRole = 
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     placeholder={editingUser ? "Biarkan kosong bila tidak ingin ganti" : "Minimal 8 karakter unik..."}
-                    className="w-full pl-3.5 pr-10 py-2.5 text-xs text-slate-900 bg-white placeholder:text-slate-400 font-medium rounded-xl border border-slate-300 focus:outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600"
+                    className="w-full pl-3.5 pr-10 py-2.5 text-xs text-slate-900 bg-white placeholder:text-slate-400 font-medium rounded-xl border border-slate-300 focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
                   />
                   <button
                     type="button"
@@ -740,7 +753,7 @@ export default function UserManagementSection({ initialUsers, currentUserRole = 
                 <button
                   type="submit"
                   disabled={loading}
-                  className="px-5 py-2 text-xs font-bold rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-100 flex items-center gap-1.5"
+                  className="px-5 py-2 text-xs font-bold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-indigo-100 flex items-center gap-1.5"
                 >
                   {loading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                   <span>{editingUser ? "Simpan Perubahan" : "Tambahkan Pengguna"}</span>
@@ -775,14 +788,14 @@ export default function UserManagementSection({ initialUsers, currentUserRole = 
               </p>
               <a
                 href="/api/excel/import?mode=template"
-                className="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 hover:text-indigo-700 mt-2"
+                className="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 hover:text-emerald-700 mt-2"
               >
                 <FileDown className="w-3.5 h-3.5" /> Download Template Format Excel
               </a>
             </div>
 
             <form onSubmit={handleImportExcel} className="space-y-4">
-              <div className="border-2 border-dashed border-slate-200 hover:border-indigo-400 rounded-2xl p-6 text-center cursor-pointer bg-slate-50/50">
+              <div className="border-2 border-dashed border-slate-200 hover:border-emerald-400 rounded-2xl p-6 text-center cursor-pointer bg-slate-50/50">
                 <input
                   type="file"
                   accept=".xlsx, .xls"
@@ -839,3 +852,5 @@ export default function UserManagementSection({ initialUsers, currentUserRole = 
     </div>
   );
 }
+
+

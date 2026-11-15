@@ -8,44 +8,88 @@ export const dynamic = "force-dynamic";
 
 export default async function SuperAdminDashboard() {
   const session = await auth();
-  const [totalUsers, totalSuperadmins, totalAdmins, totalGuru, totalMurid, totalAttendances] =
-    await Promise.all([
-      prisma.user.count(),
-      prisma.user.count({ where: { role: "SUPERADMIN" } }),
-      prisma.user.count({ where: { role: "ADMIN" } }),
-      prisma.user.count({ where: { role: "GURU" } }),
-      prisma.user.count({ where: { role: "MURID" } }),
-      prisma.attendance.count(),
-    ]);
 
-  const [managedUsers, recentAttendances] = await Promise.all([
-    prisma.user.findMany({
-      where: {
-        role: { in: ["ADMIN", "GURU", "MURID"] },
-      },
-      select: {
-        id: true,
-        name: true,
-        username: true,
-        email: true,
-        phone: true,
-        role: true,
-        kelas: true,
-        createdAt: true,
-        _count: {
-          select: {
-            attendances: true,
+  // Optimasi: Agregasi per-role dalam 1 query Prisma groupBy & 1 attendance count
+  // untuk mencegah koneksi database pool habis (exhausted pool timeout)
+  const [roleCounts, totalAttendances, managedUsers, recentAttendances, parentAttendances, dbUser] =
+    await Promise.all([
+      prisma.user.groupBy({
+        by: ["role"],
+        _count: { _all: true },
+      }),
+      prisma.attendance.count(),
+      prisma.user.findMany({
+        where: {
+          role: { in: ["ADMIN", "GURU", "MURID"] },
+        },
+        select: {
+          id: true,
+          name: true,
+          username: true,
+          email: true,
+          phone: true,
+          role: true,
+          kelas: true,
+          image: true,
+          createdAt: true,
+          _count: {
+            select: {
+              attendances: true,
+            },
           },
         },
-      },
-      orderBy: { createdAt: "desc" },
-    }),
-    prisma.attendance.findMany({
-      include: { user: true },
-      orderBy: { createdAt: "desc" },
-      take: 20,
-    }),
-  ]);
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.attendance.findMany({
+        include: { user: true },
+        orderBy: { createdAt: "desc" },
+        take: 20,
+      }),
+      prisma.parentAttendance.findMany({
+        include: {
+          student: {
+            select: {
+              id: true,
+              name: true,
+              username: true,
+              kelas: true,
+              image: true,
+              phone: true,
+            },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+        take: 30,
+      }),
+      session?.user?.id
+        ? prisma.user.findUnique({
+            where: { id: session.user.id },
+            select: {
+              id: true,
+              name: true,
+              username: true,
+              email: true,
+              phone: true,
+              role: true,
+              kelas: true,
+              image: true,
+            },
+          })
+        : Promise.resolve(null),
+    ]);
+
+  const countMap: Record<string, number> = {};
+  let totalUsers = 0;
+  for (const item of roleCounts) {
+    const c = item._count._all;
+    countMap[item.role] = c;
+    totalUsers += c;
+  }
+
+  const totalSuperadmins = countMap["SUPERADMIN"] || 0;
+  const totalAdmins = countMap["ADMIN"] || 0;
+  const totalGuru = countMap["GURU"] || 0;
+  const totalMurid = countMap["MURID"] || 0;
 
   const formattedUsers = managedUsers.map((u) => ({
     ...u,
@@ -70,21 +114,22 @@ export default async function SuperAdminDashboard() {
     },
   }));
 
-  const dbUser = session?.user?.id
-    ? await prisma.user.findUnique({
-        where: { id: session.user.id },
-        select: {
-          id: true,
-          name: true,
-          username: true,
-          email: true,
-          phone: true,
-          role: true,
-          kelas: true,
-          image: true,
-        },
-      })
-    : null;
+  const formattedParentAttendances = parentAttendances.map((p) => ({
+    id: p.id,
+    parentName: p.parentName,
+    parentPhone: p.parentPhone,
+    status: p.status as "HADIR" | "BELUM_HADIR" | "IZIN" | "SAKIT" | "TIDAK_HADIR",
+    notes: p.notes,
+    createdAt: p.createdAt.toISOString(),
+    student: {
+      id: p.student.id,
+      name: p.student.name,
+      username: p.student.username,
+      kelas: p.student.kelas,
+      image: p.student.image,
+      phone: p.student.phone,
+    },
+  }));
 
   const overviewContent = (
     <div className="space-y-6 sm:space-y-8">
@@ -120,12 +165,12 @@ export default async function SuperAdminDashboard() {
         <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-xs">
           <div className="flex items-center justify-between">
             <p className="text-sm font-medium text-slate-500">Administrator</p>
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 text-blue-700">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-teal-100 text-teal-700">
               <KeyRound className="w-5 h-5" />
             </div>
           </div>
           <p className="mt-3 text-3xl font-bold text-slate-800">{totalAdmins + totalSuperadmins}</p>
-          <p className="mt-1 text-xs text-blue-600 font-medium">{totalSuperadmins} Superadmin • {totalAdmins} Admin</p>
+          <p className="mt-1 text-xs text-teal-600 font-medium">{totalSuperadmins} Superadmin • {totalAdmins} Admin</p>
         </div>
 
         <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-xs">
@@ -171,6 +216,7 @@ export default async function SuperAdminDashboard() {
         currentUserRole="SUPERADMIN"
         formattedUsers={formattedUsers}
         formattedAttendances={formattedAttendances}
+        formattedParentAttendances={formattedParentAttendances}
         overviewContent={overviewContent}
         user={{
           id: dbUser?.id || session?.user?.id || "",
@@ -185,3 +231,4 @@ export default async function SuperAdminDashboard() {
     </DashboardShell>
   );
 }
+

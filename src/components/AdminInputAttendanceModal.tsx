@@ -68,7 +68,7 @@ export default function AdminInputAttendanceModal({
       label: "Izin",
       desc: "Dispensasi / keperluan",
       icon: FileText,
-      color: "border-blue-500 bg-blue-50/70 text-blue-700",
+      color: "border-sky-400 bg-sky-50/70 text-sky-700",
       defaultNote: "Izin tidak dapat hadir",
     },
     {
@@ -175,7 +175,7 @@ export default function AdminInputAttendanceModal({
               placeholder="Cari nama, username, atau kelas..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full mb-2 p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-indigo-500"
+              className="w-full mb-2 p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-emerald-500"
             />
             <div className="max-h-36 overflow-y-auto space-y-1 rounded-xl border border-slate-200 p-1.5 bg-slate-50/50">
               {filteredUsers.length === 0 ? (
@@ -195,13 +195,13 @@ export default function AdminInputAttendanceModal({
                       }}
                       className={`w-full text-left px-3 py-2 rounded-xl text-xs flex items-center justify-between transition ${
                         isChosen
-                          ? "bg-indigo-600 text-white font-bold shadow-xs"
+                          ? "bg-emerald-600 text-white font-bold shadow-xs"
                           : "hover:bg-slate-200/60 text-slate-700 bg-white"
                       }`}
                     >
                       <div className="truncate">
                         <span className="font-semibold">{u.name}</span>{" "}
-                        <span className={isChosen ? "text-indigo-200" : "text-slate-400"}>
+                        <span className={isChosen ? "text-emerald-200" : "text-slate-400"}>
                           (@{u.username || "-"})
                         </span>
                       </div>
@@ -211,7 +211,7 @@ export default function AdminInputAttendanceModal({
                             ? "bg-white/20 text-white"
                             : u.role === "GURU"
                             ? "bg-emerald-100 text-emerald-800"
-                            : "bg-blue-100 text-blue-800"
+                            : "bg-emerald-50 text-emerald-800"
                         }`}
                       >
                         {u.role} {u.kelas ? `• ${u.kelas}` : ""}
@@ -235,7 +235,7 @@ export default function AdminInputAttendanceModal({
                 required
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 text-slate-800 focus:outline-none focus:border-indigo-500"
+                className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 text-slate-800 focus:outline-none focus:border-emerald-500"
               />
             </div>
           </div>
@@ -259,7 +259,7 @@ export default function AdminInputAttendanceModal({
                     }}
                     className={`p-3 rounded-2xl border-2 text-left flex flex-col gap-1 transition ${
                       isSelected
-                        ? opt.color + " shadow-xs font-bold ring-2 ring-indigo-500/20"
+                        ? opt.color + " shadow-xs font-bold ring-2 ring-emerald-500/20"
                         : "border-slate-200 bg-white hover:bg-slate-50 text-slate-600"
                     }`}
                   >
@@ -284,12 +284,12 @@ export default function AdminInputAttendanceModal({
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Tuliskan keterangan tambahan jika ada..."
-              className="w-full p-2.5 text-xs rounded-xl border border-slate-200 text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-indigo-500"
+              className="w-full p-2.5 text-xs rounded-xl border border-slate-200 text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-emerald-500"
             />
           </div>
 
           <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 text-[11px] text-slate-500 flex items-start gap-2">
-            <Clock className="w-4 h-4 text-indigo-500 shrink-0 mt-0.5" />
+            <Clock className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
             <span>
               Presensi yang diinput oleh Administrator otomatis berstatus <strong>APPROVED</strong> dan langsung muncul di riwayat presensi pengguna.
             </span>
@@ -308,7 +308,7 @@ export default function AdminInputAttendanceModal({
             <button
               type="submit"
               disabled={loading || !selectedUserId}
-              className="px-5 py-2.5 text-xs font-bold rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-200 flex items-center gap-2 transition disabled:opacity-50"
+              className="px-5 py-2.5 text-xs font-bold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-200 flex items-center gap-2 transition disabled:opacity-50"
             >
               {loading ? (
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -323,4 +323,5 @@ export default function AdminInputAttendanceModal({
     </div>
   );
 }
+
 

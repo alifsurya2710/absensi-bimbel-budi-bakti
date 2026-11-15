@@ -22,9 +22,11 @@ import {
   Thermometer,
   ChevronLeft,
   ChevronRight,
+  Users2,
 } from "lucide-react";
 import EditProfileModal from "@/components/EditProfileModal";
 import Interactive3DBackground from "@/components/Interactive3DBackground";
+import ParentAttendanceForm from "@/components/ParentAttendanceForm";
 
 interface AttendanceRecord {
   id: string;
@@ -33,6 +35,15 @@ interface AttendanceRecord {
   rejectionReason?: string | null;
   notes?: string | null;
   photo?: string | null;
+  createdAt: string;
+}
+
+interface ParentAttendanceRecord {
+  id: string;
+  parentName: string;
+  parentPhone: string;
+  status: "HADIR" | "BELUM_HADIR" | "IZIN" | "SAKIT" | "TIDAK_HADIR";
+  notes?: string | null;
   createdAt: string;
 }
 
@@ -48,9 +59,14 @@ interface AttendancePageProps {
     image?: string | null;
   };
   initialHistory: AttendanceRecord[];
+  initialParentHistory?: ParentAttendanceRecord[];
 }
 
-export default function AttendanceClient({ user: initialUser, initialHistory }: AttendancePageProps) {
+export default function AttendanceClient({
+  user: initialUser,
+  initialHistory,
+  initialParentHistory = [],
+}: AttendancePageProps) {
   const router = useRouter();
   const [currentUser, setCurrentUser] = useState(initialUser);
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
@@ -65,8 +81,8 @@ export default function AttendanceClient({ user: initialUser, initialHistory }: 
   const itemsPerPage = 5;
   const [dismissedPopupIds, setDismissedPopupIds] = useState<Set<string>>(() => new Set());
 
-  // Kontrol tampilan mobile: "home" = form presensi, "riwayat" = halaman riwayat penuh
-  const [mobileView, setMobileView] = useState<"home" | "riwayat">("home");
+  // Kontrol tampilan mobile: "home" = form presensi, "riwayat" = halaman riwayat penuh, "orangtua" = form absensi orang tua (khusus murid)
+  const [mobileView, setMobileView] = useState<"home" | "riwayat" | "orangtua">("home");
   const [mobileShowCamera, setMobileShowCamera] = useState(false);
   const [activePopup, setActivePopup] = useState<AttendanceRecord | null>(() => {
     if (initialHistory && initialHistory.length > 0) {
@@ -216,19 +232,19 @@ export default function AttendanceClient({ user: initialUser, initialHistory }: 
       <Interactive3DBackground />
 
       {/* Top Navbar */}
-      <header className="bg-white/75 backdrop-blur-xl border-b border-sky-100/80 sticky top-0 z-30 shadow-xs">
+      <header className="bg-white/75 backdrop-blur-xl border-b border-emerald-100/80 sticky top-0 z-30 shadow-xs">
         <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
             <Image
-              src="/logo.jpg"
-              alt="Logo Bimbel BUDI BAKTI"
+              src="/logo-forsiremis.png"
+              alt="Logo FORSIREMIS"
               width={38}
               height={38}
-              className="rounded-xl object-cover shadow-sm ring-2 ring-sky-200 shrink-0"
+              className="rounded-xl object-cover shadow-sm ring-2 ring-emerald-200 shrink-0"
             />
             <div className="min-w-0">
-              <h1 className="text-xs sm:text-base font-extrabold text-slate-900 leading-tight whitespace-nowrap">Absensi Bimbel BUDI BAKTI</h1>
-              <p className="text-[10px] sm:text-xs text-sky-600 font-semibold truncate">
+              <h1 className="text-xs sm:text-base font-extrabold text-slate-900 leading-tight whitespace-nowrap">FORSIREMIS</h1>
+              <p className="text-[10px] sm:text-xs text-emerald-600 font-semibold truncate">
                 Portal Presensi {currentUser.role === "GURU" ? "Guru Pendidik" : "Siswa (Murid)"}
               </p>
             </div>
@@ -238,9 +254,9 @@ export default function AttendanceClient({ user: initialUser, initialHistory }: 
             <button
               type="button"
               onClick={() => setIsEditProfileOpen(true)}
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-sky-200 bg-white hover:bg-sky-50 text-xs font-semibold text-slate-700 transition shadow-xs"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-emerald-200 bg-white hover:bg-emerald-50 text-xs font-semibold text-slate-700 transition shadow-xs"
             >
-              <UserCheck2 className="w-3.5 h-3.5 text-sky-600" />
+              <UserCheck2 className="w-3.5 h-3.5 text-emerald-600" />
               <span>Edit Profil</span>
             </button>
 
@@ -260,26 +276,26 @@ export default function AttendanceClient({ user: initialUser, initialHistory }: 
         {/* Tampil di mobile saat mobileView === "riwayat", selalu tersembunyi di desktop */}
         <div className={`sm:hidden ${mobileView === "riwayat" ? "block" : "hidden"}`}>
           {/* Back Header */}
-          <div className="flex items-center gap-3 mb-4 bg-white/80 backdrop-blur-md p-3 rounded-2xl border border-sky-100 shadow-xs">
+          <div className="flex items-center gap-3 mb-4 bg-white/80 backdrop-blur-md p-3 rounded-2xl border border-emerald-100 shadow-xs">
             <button
               type="button"
               onClick={() => setMobileView("home")}
-              className="w-9 h-9 flex items-center justify-center rounded-xl bg-sky-50 hover:bg-sky-100 text-slate-700 border border-sky-200 transition"
+              className="w-9 h-9 flex items-center justify-center rounded-xl bg-emerald-50 hover:bg-emerald-100 text-slate-700 border border-emerald-200 transition"
               aria-label="Kembali"
             >
-              <ChevronLeft className="w-5 h-5 text-sky-700" />
+              <ChevronLeft className="w-5 h-5 text-emerald-700" />
             </button>
             <div>
               <h2 className="text-sm font-extrabold text-slate-900 leading-tight">Riwayat Presensi Saya</h2>
               <p className="text-[10px] text-slate-500">Daftar kehadiran yang baru Anda ajukan</p>
             </div>
-            <span className="ml-auto text-xs text-sky-700 font-bold bg-sky-100 px-3 py-1 rounded-full border border-sky-200">
+            <span className="ml-auto text-xs text-emerald-700 font-bold bg-emerald-100 px-3 py-1 rounded-full border border-emerald-200">
               {history.length} Catatan
             </span>
           </div>
 
           {/* Riwayat Table (mobile cards) */}
-          <div className="bg-white/95 backdrop-blur-md rounded-3xl border border-sky-100 shadow-xl overflow-hidden text-slate-800">
+          <div className="bg-white/95 backdrop-blur-md rounded-3xl border border-emerald-100 shadow-xl overflow-hidden text-slate-800">
             {history.length === 0 ? (
               <div className="px-6 py-10 text-center text-slate-400 italic text-sm">
                 Belum ada data kehadiran yang tercatat.
@@ -390,7 +406,7 @@ export default function AttendanceClient({ user: initialUser, initialHistory }: 
                       onClick={() => setCurrentPage(num)}
                       className={`w-8 h-8 rounded-full text-xs font-bold transition flex items-center justify-center ${
                         num === currentPage
-                          ? "bg-indigo-600 text-white shadow-md"
+                          ? "bg-emerald-600 text-white shadow-md"
                           : "text-slate-600 hover:bg-slate-200/60"
                       }`}
                     >
@@ -412,10 +428,35 @@ export default function AttendanceClient({ user: initialUser, initialHistory }: 
           </div>
         </div>
 
+        {/* ===== MOBILE: Halaman Absensi Orang Tua (khusus role MURID, tampil jika mobileView === 'orangtua') ===== */}
+        {currentUser.role === "MURID" && (
+          <div className={`sm:hidden ${mobileView === "orangtua" ? "block" : "hidden"}`}>
+            <div className="flex items-center gap-3 mb-4 bg-white/80 backdrop-blur-md p-3 rounded-2xl border border-emerald-100 shadow-xs">
+              <button
+                type="button"
+                onClick={() => setMobileView("home")}
+                className="w-9 h-9 flex items-center justify-center rounded-xl bg-emerald-50 hover:bg-emerald-100 text-slate-700 border border-emerald-200 transition"
+                aria-label="Kembali ke Presensi Siswa"
+              >
+                <ChevronLeft className="w-5 h-5 text-emerald-700" />
+              </button>
+              <div>
+                <h2 className="text-sm font-extrabold text-slate-900 leading-tight">Absensi Orang Tua / Wali</h2>
+                <p className="text-[10px] text-slate-500">Khusus saat orang tua berkunjung ke bimbel</p>
+              </div>
+            </div>
+
+            <ParentAttendanceForm
+              studentName={currentUser.name}
+              initialHistory={initialParentHistory}
+            />
+          </div>
+        )}
+
         {/* ===== HOME VIEW: User Info + Form Presensi (mobile: hanya tampil saat mobileView === "home", desktop: selalu tampil) ===== */}
         <div className={`${mobileView === "home" ? "block" : "hidden sm:block"}`}>
         {/* User Info Greeting */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 p-6 sm:p-7 text-white shadow-xl shadow-sky-500/20 border border-white/40 flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-600 via-green-600 to-teal-700 p-6 sm:p-7 text-white shadow-xl shadow-emerald-600/20 border border-white/40 flex flex-col sm:flex-row sm:items-center justify-between gap-5">
           <div className="flex items-center gap-4">
             <div className="relative shrink-0">
               {currentUser.image ? (
@@ -437,24 +478,24 @@ export default function AttendanceClient({ user: initialUser, initialHistory }: 
               <h2 className="text-xl sm:text-2xl font-black leading-tight tracking-tight text-white">
                 Selamat Datang, {currentUser.name}!
               </h2>
-              <p className="text-xs text-sky-100 mt-1 font-medium">
+              <p className="text-xs text-emerald-100 mt-1 font-medium">
                 @{currentUser.username || "-"} • {currentUser.email || "Tanpa email"}
               </p>
-              <p className="text-xs text-sky-200 mt-0.5">
+              <p className="text-xs text-emerald-200 mt-0.5">
                 {currentUser.kelas ? `Kelas: ${currentUser.kelas} • ` : ""}No. HP: {currentUser.phone || "-"}
               </p>
             </div>
           </div>
-          <div className="text-right sm:border-l sm:border-white/20 sm:pl-6 text-xs text-sky-100 shrink-0 flex flex-col items-start sm:items-end justify-center">
+          <div className="text-right sm:border-l sm:border-white/20 sm:pl-6 text-xs text-emerald-100 shrink-0 flex flex-col items-start sm:items-end justify-center">
             <button
               type="button"
               onClick={() => setIsEditProfileOpen(true)}
-              className="mb-2 sm:mb-3 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white/20 hover:bg-white/30 text-white font-bold text-xs backdrop-blur-md border border-white/30 transition shadow-xs"
+              className="hidden sm:inline-flex mb-2 sm:mb-3 items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white/20 hover:bg-white/30 text-white font-bold text-xs backdrop-blur-md border border-white/30 transition shadow-xs"
             >
               <UserCheck2 className="w-3.5 h-3.5 text-amber-300" /> Edit Profil Saya
             </button>
             <p className="font-semibold text-white">Hari Ini:</p>
-            <p className="text-sky-100">
+            <p className="text-emerald-100">
               {new Date().toLocaleDateString("id-ID", {
                 weekday: "long",
                 day: "numeric",
@@ -466,7 +507,7 @@ export default function AttendanceClient({ user: initialUser, initialHistory }: 
         </div>
 
         {/* Form Presensi */}
-        <div className="bg-white/95 backdrop-blur-xl rounded-3xl border border-sky-100/90 p-6 sm:p-8 shadow-[0_15px_40px_rgba(56,189,248,0.12)] text-slate-800">
+        <div className="bg-white/95 backdrop-blur-xl rounded-3xl border border-emerald-100/90 p-6 sm:p-8 shadow-[0_15px_40px_rgba(16,185,129,0.12)] text-slate-800">
           <div className="mb-6 pb-4 border-b border-slate-100">
             <h3 className="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">Isi Kehadiran Hari Ini</h3>
             <p className="text-xs text-slate-500 mt-1">
@@ -507,7 +548,7 @@ export default function AttendanceClient({ user: initialUser, initialHistory }: 
                       }}
                       className={`flex flex-col items-center text-center p-3.5 rounded-2xl border-2 transition-all duration-200 ${
                         isSelected
-                          ? "border-indigo-600 bg-indigo-50/70 shadow-md scale-[1.02] ring-2 ring-indigo-500/20"
+                          ? "border-emerald-600 bg-emerald-50/80 shadow-md scale-[1.02] ring-2 ring-emerald-500/20"
                           : "border-slate-200/90 hover:border-slate-300 bg-white hover:bg-slate-50/60"
                       }`}
                     >
@@ -525,14 +566,14 @@ export default function AttendanceClient({ user: initialUser, initialHistory }: 
               <div className="space-y-3">
                 {/* Di Mobile: Jika belum diklik di navbar bawah, tampilkan petunjuk instruksi */}
                 <div className={`sm:hidden ${mobileShowCamera ? "hidden" : "block"}`}>
-                  <div className="p-4 rounded-2xl border-2 border-dashed border-indigo-200 bg-indigo-50/50 flex flex-col items-center justify-center text-center gap-2 text-indigo-900">
-                    <div className="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center shadow-md animate-bounce">
+                  <div className="p-4 rounded-2xl border-2 border-dashed border-emerald-200 bg-emerald-50/50 flex flex-col items-center justify-center text-center gap-2 text-emerald-950">
+                    <div className="w-10 h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center shadow-md animate-bounce">
                       <Camera className="w-5 h-5" />
                     </div>
                     <div>
                       <p className="text-xs font-extrabold">Foto Bukti / Selfie Kehadiran *Wajib</p>
-                      <p className="text-[11px] text-indigo-600/80 mt-0.5">
-                        Klik fitur <strong className="text-indigo-700">Selfie</strong> di navigation bawah untuk mengambil foto langsung.
+                      <p className="text-[11px] text-emerald-700/80 mt-0.5">
+                        Klik fitur <strong className="text-emerald-700">Selfie</strong> di navigation bawah untuk mengambil foto langsung.
                       </p>
                     </div>
                   </div>
@@ -541,7 +582,7 @@ export default function AttendanceClient({ user: initialUser, initialHistory }: 
                 {/* Kontainer Kamera (Selalu tampil di desktop, di mobile hanya tampil jika mobileShowCamera aktif) */}
                 <div
                   id="kamera-selfie"
-                  className={`p-5 rounded-2xl border border-indigo-100 bg-gradient-to-b from-indigo-50/40 to-slate-50/50 space-y-3 scroll-mt-24 ${
+                  className={`p-5 rounded-2xl border border-emerald-100 bg-gradient-to-b from-emerald-50/40 to-slate-50/50 space-y-3 scroll-mt-24 ${
                     mobileShowCamera ? "block" : "hidden sm:block"
                   }`}
                 >
@@ -581,7 +622,7 @@ export default function AttendanceClient({ user: initialUser, initialHistory }: 
                           <button
                             type="button"
                             onClick={takeSelfie}
-                            className="px-4 py-2 bg-gradient-to-r from-blue-600 via-indigo-600 to-indigo-700 text-white rounded-xl text-xs font-bold shadow-lg hover:from-blue-500 hover:to-indigo-600 flex items-center gap-2"
+                            className="px-4 py-2 bg-gradient-to-r from-emerald-600 via-green-600 to-teal-700 text-white rounded-xl text-xs font-bold shadow-lg hover:from-emerald-500 hover:to-teal-600 flex items-center gap-2"
                           >
                             <Camera className="w-4 h-4" /> Ambil Foto Sekarang
                           </button>
@@ -595,7 +636,7 @@ export default function AttendanceClient({ user: initialUser, initialHistory }: 
                         </div>
                       </div>
                     ) : photo ? (
-                      <div className="relative w-48 h-48 rounded-2xl overflow-hidden border-2 border-indigo-600 shadow-md">
+                      <div className="relative w-48 h-48 rounded-2xl overflow-hidden border-2 border-emerald-600 shadow-md">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={photo} alt="Bukti Kehadiran" className="w-full h-full object-cover" />
                         <div className="absolute top-2 right-2 bg-emerald-600 text-white p-1 rounded-full shadow-xs">
@@ -607,7 +648,7 @@ export default function AttendanceClient({ user: initialUser, initialHistory }: 
                         <button
                           type="button"
                           onClick={startCamera}
-                          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-indigo-700 hover:from-blue-500 hover:to-indigo-600 text-white text-xs font-bold shadow-lg shadow-indigo-600/25 transition"
+                          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-600 via-green-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 text-white text-xs font-bold shadow-lg shadow-emerald-600/25 transition"
                         >
                           <Camera className="w-4 h-4" /> Buka Kamera Selfie
                         </button>
@@ -628,7 +669,7 @@ export default function AttendanceClient({ user: initialUser, initialHistory }: 
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Tuliskan catatan, alasan izin/sakit, atau jam kedatangan..."
-                className="w-full p-3.5 rounded-2xl border border-slate-200 text-xs focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition"
+                className="w-full p-3.5 rounded-2xl border border-slate-200 text-xs focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 focus:outline-none transition"
               />
             </div>
 
@@ -636,7 +677,7 @@ export default function AttendanceClient({ user: initialUser, initialHistory }: 
             <button
               type="submit"
               disabled={loading || (isPhotoRequired && !photo)}
-              className="w-full flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-indigo-700 hover:from-blue-500 hover:to-indigo-600 py-3.5 text-sm font-extrabold text-white shadow-xl shadow-indigo-600/25 transition disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-600 via-green-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 py-3.5 text-sm font-extrabold text-white shadow-xl shadow-emerald-600/25 transition disabled:opacity-50"
             >
               {loading ? (
                 <>
@@ -653,17 +694,27 @@ export default function AttendanceClient({ user: initialUser, initialHistory }: 
           </form>
         </div>
 
+        {/* ===== DESKTOP: Absensi Orang Tua / Wali (Disatukan di tengah antara Form Murid & Riwayat Presensi) ===== */}
+        {currentUser.role === "MURID" && (
+          <div className="hidden sm:block">
+            <ParentAttendanceForm
+              studentName={currentUser.name}
+              initialHistory={initialParentHistory}
+            />
+          </div>
+        )}
+
         </div>
         {/* ===== END HOME VIEW ===== */}
 
         {/* Riwayat Presensi Saya — Desktop only (mobile punya halaman sendiri di atas) */}
         <div
           id="riwayat-presensi"
-          className="hidden sm:block bg-white/95 backdrop-blur-xl rounded-3xl border border-sky-100/90 shadow-[0_15px_40px_rgba(56,189,248,0.12)] overflow-hidden text-slate-800 scroll-mt-20"
+          className="hidden sm:block bg-white/95 backdrop-blur-xl rounded-3xl border border-emerald-100/90 shadow-[0_15px_40px_rgba(16,185,129,0.12)] overflow-hidden text-slate-800 scroll-mt-20"
         >
-          <div className="px-6 py-4.5 border-b border-sky-100/80 flex items-center justify-between bg-sky-50/40">
+          <div className="px-6 py-4.5 border-b border-emerald-100/80 flex items-center justify-between bg-emerald-50/40">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center font-bold shadow-xs">
+              <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold shadow-xs">
                 <History className="w-4 h-4" />
               </div>
               <div>
@@ -671,7 +722,7 @@ export default function AttendanceClient({ user: initialUser, initialHistory }: 
                 <p className="text-[11px] text-slate-500">Daftar kehadiran yang baru Anda ajukan</p>
               </div>
             </div>
-            <span className="text-xs text-sky-700 font-bold bg-sky-100 px-3 py-1 rounded-full border border-sky-200">
+            <span className="text-xs text-emerald-700 font-bold bg-emerald-100 px-3 py-1 rounded-full border border-emerald-200">
               {history.length} Catatan
             </span>
           </div>
@@ -894,7 +945,7 @@ export default function AttendanceClient({ user: initialUser, initialHistory }: 
                     </div>
 
                     <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-600 text-xs flex items-center gap-2">
-                      <RotateCcw className="w-4 h-4 text-indigo-600 shrink-0" />
+                      <RotateCcw className="w-4 h-4 text-emerald-600 shrink-0" />
                       <span>
                         Silakan tutup jendela ini dan <strong>lakukan pengisian presensi ulang</strong> dengan kamera selfie atau data yang benar.
                       </span>
@@ -941,7 +992,7 @@ export default function AttendanceClient({ user: initialUser, initialHistory }: 
       )}
 
       {/* Mobile Bottom Navigation Bar (Khusus Role Murid & Guru di Mobile) */}
-      <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-2xl border-t border-sky-200/70 px-3 py-2 shadow-[0_-8px_30px_rgba(56,189,248,0.15)] safe-area-pb">
+      <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-2xl border-t border-emerald-200/70 px-3 py-2 shadow-[0_-8px_30px_rgba(16,185,129,0.15)] safe-area-pb">
         <div className="flex items-center justify-around max-w-md mx-auto relative">
           {/* 1. Edit Profil / Akun */}
           <button
@@ -949,11 +1000,26 @@ export default function AttendanceClient({ user: initialUser, initialHistory }: 
             onClick={() => setIsEditProfileOpen(true)}
             className="flex flex-col items-center gap-1 py-1 px-2.5 rounded-2xl text-slate-500 hover:text-slate-800 transition"
           >
-            <UserCheck2 className="w-5 h-5 text-sky-600 stroke-[1.8]" />
+            <UserCheck2 className="w-5 h-5 text-emerald-600 stroke-[1.8]" />
             <span className="text-[10px] font-medium tracking-tight">Akun</span>
           </button>
 
-          {/* 2. Tombol Kamera Tengah (Floating Action Button) */}
+          {/* 2. Riwayat Presensi Saya (Di dekat fitur Akun) */}
+          <button
+            type="button"
+            onClick={() => {
+              setMobileView("riwayat");
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+            className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-2xl transition ${
+              mobileView === "riwayat" ? "text-emerald-600 font-black scale-105 bg-emerald-50 shadow-xs" : "text-slate-500 hover:text-slate-800"
+            }`}
+          >
+            <History className="w-5 h-5 text-emerald-600 stroke-[1.8]" />
+            <span className="text-[10px] font-medium tracking-tight">Riwayat</span>
+          </button>
+
+          {/* 3. Tombol Kamera Tengah / Selfie (Floating Action Button di posisi tengah/riwayat sebelumnya) */}
           <div className="relative -top-4 flex flex-col items-center">
             <button
               type="button"
@@ -970,33 +1036,35 @@ export default function AttendanceClient({ user: initialUser, initialHistory }: 
                   }
                 }, 50);
               }}
-              className="w-13 h-13 rounded-full bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-lg shadow-sky-500/40 ring-4 ring-white hover:scale-105 active:scale-95 transition"
+              className="w-13 h-13 rounded-full bg-gradient-to-r from-emerald-600 via-green-600 to-teal-700 text-white flex items-center justify-center shadow-lg shadow-emerald-600/30 ring-4 ring-white hover:scale-105 active:scale-95 transition"
               aria-label="Foto Bukti / Selfie Kehadiran"
               title="Foto Bukti / Selfie Kehadiran"
             >
               <Camera className="w-6 h-6 text-white" />
             </button>
-            <span className="text-[9px] font-bold text-sky-600 mt-1 whitespace-nowrap">
+            <span className="text-[9px] font-bold text-emerald-600 mt-1 whitespace-nowrap">
               Selfie
             </span>
           </div>
 
-          {/* 3. Riwayat Presensi Saya */}
-          <button
-            type="button"
-            onClick={() => {
-              setMobileView("riwayat");
-              window.scrollTo({ top: 0, behavior: "smooth" });
-            }}
-            className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-2xl transition ${
-              mobileView === "riwayat" ? "text-sky-600 font-black scale-105 bg-sky-50 shadow-xs" : "text-slate-500 hover:text-slate-800"
-            }`}
-          >
-            <History className="w-5 h-5 text-sky-600 stroke-[1.8]" />
-            <span className="text-[10px] font-medium tracking-tight">Riwayat</span>
-          </button>
+          {/* 4. Absensi Orang Tua (Khusus Role MURID di Mobile) */}
+          {currentUser.role === "MURID" && (
+            <button
+              type="button"
+              onClick={() => {
+                setMobileView("orangtua");
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
+              className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-2xl transition ${
+                mobileView === "orangtua" ? "text-emerald-700 font-black scale-105 bg-emerald-50 shadow-xs ring-1 ring-emerald-200" : "text-slate-500 hover:text-slate-800"
+              }`}
+            >
+              <Users2 className="w-5 h-5 text-emerald-600 stroke-[1.8]" />
+              <span className="text-[10px] font-medium tracking-tight">Orang Tua</span>
+            </button>
+          )}
 
-          {/* 4. Keluar */}
+          {/* 5. Keluar */}
           <button
             type="button"
             onClick={() => signOut({ callbackUrl: "/login" })}
@@ -1034,4 +1102,7 @@ export default function AttendanceClient({ user: initialUser, initialHistory }: 
     </div>
   );
 }
+
+
+
 

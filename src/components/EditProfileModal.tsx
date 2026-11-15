@@ -149,7 +149,7 @@ export default function EditProfileModal({
       <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-6 sm:p-8 border border-slate-100 my-8 animate-in fade-in zoom-in-95 duration-200">
         <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-indigo-50 border border-indigo-100 text-indigo-600 flex items-center justify-center font-bold">
+            <div className="w-10 h-10 rounded-2xl bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center font-bold">
               <User className="w-5 h-5" />
             </div>
             <div>
@@ -189,7 +189,7 @@ export default function EditProfileModal({
           <div className="flex items-center gap-4 p-3 bg-slate-50 rounded-2xl border border-slate-100">
             <div className="relative">
               {image ? (
-                <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-indigo-500 shadow-xs">
+                <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-emerald-500 shadow-xs">
                   <Image
                     src={image}
                     alt="Foto Profil"
@@ -223,7 +223,7 @@ export default function EditProfileModal({
                   htmlFor="profile-pic-upload"
                   className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition shadow-2xs"
                 >
-                  <Camera className="w-3.5 h-3.5 text-indigo-600" /> Pilih Foto
+                  <Camera className="w-3.5 h-3.5 text-emerald-600" /> Pilih Foto
                 </label>
                 {image && (
                   <button
@@ -250,7 +250,7 @@ export default function EditProfileModal({
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-900 bg-white placeholder:text-slate-400 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition"
+                className="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-900 bg-white placeholder:text-slate-400 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 focus:outline-none transition"
                 placeholder="Nama Lengkap Anda"
               />
             </div>
@@ -269,7 +269,7 @@ export default function EditProfileModal({
                   required
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-900 bg-white placeholder:text-slate-400 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition"
+                  className="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-900 bg-white placeholder:text-slate-400 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 focus:outline-none transition"
                   placeholder="username_anda"
                 />
               </div>
@@ -286,7 +286,7 @@ export default function EditProfileModal({
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-900 bg-white placeholder:text-slate-400 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition"
+                  className="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-900 bg-white placeholder:text-slate-400 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 focus:outline-none transition"
                   placeholder="nama@gmail.com"
                 />
               </div>
@@ -305,7 +305,7 @@ export default function EditProfileModal({
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-900 bg-white placeholder:text-slate-400 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition"
+                  className="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-900 bg-white placeholder:text-slate-400 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 focus:outline-none transition"
                   placeholder="081234567890"
                 />
               </div>
@@ -323,7 +323,7 @@ export default function EditProfileModal({
                     type="text"
                     value={kelas}
                     onChange={(e) => setKelas(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-900 bg-white placeholder:text-slate-400 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition"
+                    className="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-900 bg-white placeholder:text-slate-400 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 focus:outline-none transition"
                     placeholder="XII RPL 1"
                   />
                 </div>
@@ -347,7 +347,7 @@ export default function EditProfileModal({
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-10 pr-10 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-900 bg-white placeholder:text-slate-400 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition"
+                className="w-full pl-10 pr-10 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-900 bg-white placeholder:text-slate-400 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 focus:outline-none transition"
                 placeholder="Biarkan kosong jika tidak diubah"
               />
               <button
@@ -403,7 +403,7 @@ export default function EditProfileModal({
             <button
               type="submit"
               disabled={loading || (password.length > 0 && !isPasswordValid)}
-              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md shadow-indigo-200 transition disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md shadow-emerald-200 transition disabled:opacity-50"
             >
               {loading ? (
                 <>
@@ -423,4 +423,6 @@ export default function EditProfileModal({
     </div>
   );
 }
+
+
 

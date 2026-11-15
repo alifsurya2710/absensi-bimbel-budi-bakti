@@ -66,7 +66,7 @@ export default function MathCaptcha({
           type="button"
           onClick={generateCaptcha}
           disabled={disabled}
-          className="inline-flex items-center gap-1 text-[11px] font-semibold text-indigo-600 hover:text-indigo-800 disabled:opacity-50 transition"
+          className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 hover:text-emerald-800 disabled:opacity-50 transition"
           title="Ganti Soal Matematika"
         >
           <RefreshCw className="w-3 h-3" />
@@ -76,13 +76,13 @@ export default function MathCaptcha({
 
       <div className="flex items-center gap-2">
         {/* Tampilan Soal Matematika */}
-        <div className="flex items-center justify-center gap-1.5 px-3 py-2 bg-gradient-to-r from-indigo-50 to-slate-100 border border-indigo-200/80 rounded-xl font-mono text-sm font-extrabold text-indigo-900 select-none shadow-2xs">
-          <Calculator className="w-4 h-4 text-indigo-500 shrink-0 mr-1" />
+        <div className="flex items-center justify-center gap-1.5 px-3 py-2 bg-gradient-to-r from-emerald-50 to-slate-100 border border-emerald-200/80 rounded-xl font-mono text-sm font-extrabold text-emerald-900 select-none shadow-2xs">
+          <Calculator className="w-4 h-4 text-emerald-500 shrink-0 mr-1" />
           <span>{question.n1}</span>
           <span className="text-rose-600 font-bold">{question.op}</span>
           <span>{question.n2}</span>
           <span>=</span>
-          <span className="text-indigo-400">?</span>
+          <span className="text-emerald-400">?</span>
         </div>
 
         {/* Input Jawaban */}
@@ -94,10 +94,11 @@ export default function MathCaptcha({
             value={value}
             onChange={(e) => handleInputChange(e.target.value)}
             placeholder="Jawaban angka..."
-            className="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 text-slate-800 placeholder:text-slate-400 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition disabled:bg-slate-100 disabled:cursor-not-allowed"
+            className="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 text-slate-800 placeholder:text-slate-400 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 focus:outline-none transition disabled:bg-slate-100 disabled:cursor-not-allowed"
           />
         </div>
       </div>
     </div>
   );
 }
+

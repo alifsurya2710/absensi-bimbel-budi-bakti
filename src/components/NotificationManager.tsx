@@ -242,9 +242,9 @@ export default function NotificationManager({
   const permissionModalContent =
     isPermissionBannerVisible && !hidePermissionBanner ? (
       <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/70 backdrop-blur-md p-4 animate-in fade-in duration-300">
-        <div className="bg-white rounded-3xl p-6 shadow-2xl border border-sky-100 max-w-sm w-full mx-auto space-y-4 animate-in zoom-in-95 duration-200">
+        <div className="bg-white rounded-3xl p-6 shadow-2xl border border-emerald-100 max-w-sm w-full mx-auto space-y-4 animate-in zoom-in-95 duration-200">
           <div className="flex items-start gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-sky-200 shrink-0">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-600 flex items-center justify-center text-white shadow-md shadow-emerald-200 shrink-0">
               <Bell className="w-6 h-6 animate-bounce" />
             </div>
             <div className="space-y-1">
@@ -269,7 +269,7 @@ export default function NotificationManager({
               type="button"
               onClick={handleRequestPermission}
               disabled={isSubscribing}
-              className="flex-1 py-2.5 text-xs font-bold text-white bg-sky-600 hover:bg-sky-700 rounded-xl transition shadow-md shadow-sky-200 flex items-center justify-center gap-1.5"
+              className="flex-1 py-2.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition shadow-md shadow-emerald-200 flex items-center justify-center gap-1.5"
             >
               <Sparkles className="w-3.5 h-3.5" />
               <span>Aktifkan</span>
@@ -566,3 +566,4 @@ function urlBase64ToUint8Array(base64String: string) {
   }
   return outputArray;
 }
+

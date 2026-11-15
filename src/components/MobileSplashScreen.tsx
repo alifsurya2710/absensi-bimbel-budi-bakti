@@ -41,12 +41,12 @@ export default function MobileSplashScreen() {
 
   return (
     <div
-      className={`fixed inset-0 z-[100] md:hidden flex flex-col items-center justify-between p-8 bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-950 text-white transition-opacity duration-500 select-none ${
+      className={`fixed inset-0 z-[100] md:hidden flex flex-col items-center justify-between p-8 bg-gradient-to-br from-slate-950 via-emerald-950 to-slate-950 text-white transition-opacity duration-500 select-none ${
         isFadingOut ? "opacity-0 pointer-events-none" : "opacity-100"
       }`}
     >
       {/* Background Glow */}
-      <div className="absolute top-1/4 w-72 h-72 rounded-full bg-blue-600/25 blur-3xl animate-pulse pointer-events-none" />
+      <div className="absolute top-1/4 w-72 h-72 rounded-full bg-emerald-500/25 blur-3xl animate-pulse pointer-events-none" />
 
       {/* Spacer Atas */}
       <div className="h-4" />
@@ -55,8 +55,8 @@ export default function MobileSplashScreen() {
       <div className="flex flex-col items-center text-center max-w-xs z-10 -mt-10">
         <div className="relative w-28 h-28 rounded-3xl overflow-hidden shadow-2xl ring-4 ring-white/20 mb-6 bg-white p-1">
           <Image
-            src="/logo.jpg"
-            alt="Logo Bimbel BUDI BAKTI"
+            src="/logo-forsiremis.png"
+            alt="Logo FORSIREMIS"
             fill
             className="object-cover rounded-2xl"
             priority
@@ -64,17 +64,17 @@ export default function MobileSplashScreen() {
         </div>
 
         <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white leading-snug">
-          Selamat Datang di Absensi Bimbel Budi Bakti
+          Selamat Datang di FORSIREMIS
         </h1>
 
-        <p className="text-xs text-indigo-200/80 mt-2.5 font-medium leading-relaxed">
-          Sistem Presensi Cepat, Rapi &amp; Akurat Berbasis Kamera Selfie
+        <p className="text-xs text-emerald-200/90 mt-2.5 font-medium leading-relaxed">
+          bimbingan latihan persiapan menuju PTN
         </p>
       </div>
 
       {/* Bagian Bawah: Loading Indicator */}
       <div className="pb-8 flex flex-col items-center gap-2 z-10">
-        <Loader2 className="w-5 h-5 text-indigo-400 animate-spin" />
+        <Loader2 className="w-5 h-5 text-emerald-400 animate-spin" />
         <span className="text-[11px] font-semibold text-slate-400 tracking-wider">
           Memuat aplikasi...
         </span>
@@ -82,3 +82,5 @@ export default function MobileSplashScreen() {
     </div>
   );
 }
+
+

@@ -94,7 +94,7 @@ function ResetPasswordForm() {
         </div>
         <Link
           href="/forgot-password"
-          className="inline-block text-xs font-semibold text-indigo-600 hover:underline"
+          className="inline-block text-xs font-semibold text-emerald-600 hover:underline"
         >
           Ajukan permintaan baru
         </Link>
@@ -129,7 +129,7 @@ function ResetPasswordForm() {
             required
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
-            className="w-full pl-10 pr-11 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition"
+            className="w-full pl-10 pr-11 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 focus:outline-none transition"
             placeholder="Minimal 8 karakter unik..."
           />
           <button
@@ -180,7 +180,7 @@ function ResetPasswordForm() {
             required
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition"
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 focus:outline-none transition"
             placeholder="Ulangi kata sandi baru..."
           />
         </div>
@@ -189,7 +189,7 @@ function ResetPasswordForm() {
       <button
         type="submit"
         disabled={loading || !isPasswordValid || newPassword !== confirmPassword}
-        className="w-full mt-2 flex items-center justify-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 py-3 text-sm font-semibold text-white shadow-md shadow-indigo-200 transition disabled:opacity-50"
+        className="w-full mt-2 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 py-3 text-sm font-semibold text-white shadow-md shadow-emerald-200 transition disabled:opacity-50"
       >
         {loading ? (
           <>
@@ -216,15 +216,15 @@ export default function ResetPasswordPage() {
       <div className="w-full max-w-md bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl p-6 sm:p-8 md:p-10 border border-white/80 ring-1 ring-slate-900/5 relative z-10">
         <Link href="/" className="flex items-center gap-3 mb-6 hover:opacity-85 transition">
           <Image
-            src="/logo.jpg"
-            alt="Logo Bimbel BUDI BAKTI"
+            src="/logo-forsiremis.png"
+            alt="Logo FORSIREMIS"
             width={40}
             height={40}
             className="rounded-xl object-cover shadow-sm shrink-0"
           />
           <div>
             <h1 className="text-base sm:text-xl font-bold text-slate-800 leading-tight">Buat Kata Sandi Baru</h1>
-            <p className="text-xs text-slate-400">Absensi Bimbel BUDI BAKTI</p>
+            <p className="text-xs text-slate-400">FORSIREMIS</p>
           </div>
         </Link>
 
@@ -241,4 +241,7 @@ export default function ResetPasswordPage() {
     </div>
   );
 }
+
+
+
 

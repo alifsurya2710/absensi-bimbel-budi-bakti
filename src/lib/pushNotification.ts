@@ -88,8 +88,8 @@ export async function createAndDispatchNotification({
     const pushPayload: SendPushPayload = {
       title,
       body: message,
-      icon: "/logo.jpg",
-      badge: "/logo.jpg",
+      icon: "/logo-forsiremis.png",
+      badge: "/logo-forsiremis.png",
       url: "/dashboard",
       data: {
         notificationId: notification.id,
@@ -134,4 +134,5 @@ export async function createAndDispatchNotification({
     return null;
   }
 }
+
 

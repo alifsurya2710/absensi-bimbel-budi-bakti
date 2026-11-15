@@ -161,7 +161,7 @@ export default function AdminAttendanceApprovalTable({ initialAttendances, users
           <button
             type="button"
             onClick={() => setIsInputModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition shadow-xs"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition shadow-xs"
           >
             <UserPlus className="w-3.5 h-3.5" />
             <span>Isi Alpa / Presensi Manual</span>
@@ -562,3 +562,5 @@ export default function AdminAttendanceApprovalTable({ initialAttendances, users
     </div>
   );
 }
+
+

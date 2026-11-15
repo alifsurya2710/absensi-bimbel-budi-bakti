@@ -12,14 +12,14 @@ export default function MobileBottomNav({ isLoggedIn = false }: MobileBottomNavP
   const pathname = usePathname();
 
   return (
-    <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-2xl border-t border-sky-200/70 px-4 py-2.5 shadow-[0_-8px_30px_rgba(56,189,248,0.15)] safe-area-pb">
+    <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-2xl border-t border-emerald-200/70 px-4 py-2.5 shadow-[0_-8px_30px_rgba(16,185,129,0.15)] safe-area-pb">
       <div className="flex items-center justify-around max-w-md mx-auto">
         {/* Beranda */}
         <Link
           href="/"
           className={`flex flex-col items-center gap-1 py-1 px-3.5 rounded-2xl transition-all ${
             pathname === "/"
-              ? "text-sky-600 font-black scale-105 bg-sky-50/80 shadow-xs"
+              ? "text-emerald-700 font-black scale-105 bg-emerald-50/90 ring-1 ring-emerald-200/60 shadow-xs"
               : "text-slate-500 hover:text-slate-800 font-medium"
           }`}
         >
@@ -33,7 +33,7 @@ export default function MobileBottomNav({ isLoggedIn = false }: MobileBottomNavP
             href="/dashboard"
             className={`flex flex-col items-center gap-1 py-1 px-3.5 rounded-2xl transition-all ${
               pathname?.startsWith("/dashboard")
-                ? "text-sky-600 font-black scale-105 bg-sky-50/80 shadow-xs"
+                ? "text-emerald-700 font-black scale-105 bg-emerald-50/90 ring-1 ring-emerald-200/60 shadow-xs"
                 : "text-slate-500 hover:text-slate-800 font-medium"
             }`}
           >
@@ -47,7 +47,7 @@ export default function MobileBottomNav({ isLoggedIn = false }: MobileBottomNavP
               href="/register"
               className={`flex flex-col items-center gap-1 py-1 px-3.5 rounded-2xl transition-all ${
                 pathname === "/register"
-                  ? "text-sky-600 font-black scale-105 bg-sky-50/80 shadow-xs"
+                  ? "text-emerald-700 font-black scale-105 bg-emerald-50/90 ring-1 ring-emerald-200/60 shadow-xs"
                   : "text-slate-500 hover:text-slate-800 font-medium"
               }`}
             >
@@ -60,7 +60,7 @@ export default function MobileBottomNav({ isLoggedIn = false }: MobileBottomNavP
               href="/login"
               className={`flex flex-col items-center gap-1 py-1 px-3.5 rounded-2xl transition-all ${
                 pathname === "/login"
-                  ? "text-sky-600 font-black scale-105 bg-sky-50/80 shadow-xs"
+                  ? "text-emerald-700 font-black scale-105 bg-emerald-50/90 ring-1 ring-emerald-200/60 shadow-xs"
                   : "text-slate-500 hover:text-slate-800 font-medium"
               }`}
             >
@@ -73,3 +73,5 @@ export default function MobileBottomNav({ isLoggedIn = false }: MobileBottomNavP
     </nav>
   );
 }
+
+

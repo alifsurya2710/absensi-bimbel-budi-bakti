@@ -39,6 +39,7 @@ export async function GET(req: Request) {
         phone: true,
         role: true,
         kelas: true,
+        image: true,
         createdAt: true,
         _count: {
           select: {
@@ -126,4 +127,5 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Gagal menambahkan pengguna" }, { status: 500 });
   }
 }
+
 

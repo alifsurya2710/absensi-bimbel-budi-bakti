@@ -18,16 +18,22 @@ export default async function AttendancePage() {
     redirect("/dashboard/admin");
   }
 
-  // Ambil data profil dan riwayat presensi user ini
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-  });
-
-  const attendances = await prisma.attendance.findMany({
-    where: { userId: session.user.id },
-    orderBy: { createdAt: "desc" },
-    take: 15,
-  });
+  // Ambil data profil, riwayat presensi murid, dan riwayat presensi orang tua (jika murid)
+  const [user, attendances, parentAttendances] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: session.user.id },
+    }),
+    prisma.attendance.findMany({
+      where: { userId: session.user.id },
+      orderBy: { createdAt: "desc" },
+      take: 15,
+    }),
+    prisma.parentAttendance.findMany({
+      where: { studentId: session.user.id },
+      orderBy: { createdAt: "desc" },
+      take: 10,
+    }),
+  ]);
 
   const formattedHistory = attendances.map((item) => ({
     id: item.id,
@@ -36,6 +42,15 @@ export default async function AttendancePage() {
     rejectionReason: item.rejectionReason,
     notes: item.notes,
     photo: item.photo,
+    createdAt: item.createdAt.toISOString(),
+  }));
+
+  const formattedParentHistory = parentAttendances.map((item) => ({
+    id: item.id,
+    parentName: item.parentName,
+    parentPhone: item.parentPhone,
+    status: item.status as "HADIR" | "BELUM_HADIR" | "IZIN" | "SAKIT" | "TIDAK_HADIR",
+    notes: item.notes,
     createdAt: item.createdAt.toISOString(),
   }));
 
@@ -52,7 +67,9 @@ export default async function AttendancePage() {
         image: user?.image,
       }}
       initialHistory={formattedHistory}
+      initialParentHistory={formattedParentHistory}
     />
   );
 }
+
 

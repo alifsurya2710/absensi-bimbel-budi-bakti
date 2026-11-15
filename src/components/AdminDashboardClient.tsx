@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { signOut } from "next-auth/react";
+import Image from "next/image";
 import UserManagementSection from "@/components/UserManagementSection";
 import AdminAttendanceApprovalTable from "@/components/AdminAttendanceApprovalTable";
+import ParentAttendanceTable, { ParentAttendanceItem } from "@/components/ParentAttendanceTable";
 import EditProfileModal from "@/components/EditProfileModal";
 import NotificationManager from "@/components/NotificationManager";
 import {
@@ -11,8 +12,7 @@ import {
   CheckSquare,
   LayoutDashboard,
   ChevronLeft,
-  UserCheck2,
-  LogOut,
+  Users2,
 } from "lucide-react";
 
 interface UserItem {
@@ -23,6 +23,7 @@ interface UserItem {
   phone: string | null;
   role: "GURU" | "MURID" | "ADMIN" | "SUPERADMIN";
   kelas?: string | null;
+  image?: string | null;
   createdAt: string;
   _count?: {
     attendances: number;
@@ -51,6 +52,7 @@ interface AdminDashboardClientProps {
   currentUserRole: "SUPERADMIN" | "ADMIN";
   formattedUsers: UserItem[];
   formattedAttendances: AttendanceRecord[];
+  formattedParentAttendances?: ParentAttendanceItem[];
   overviewContent: React.ReactNode;
   user?: {
     id: string;
@@ -67,11 +69,12 @@ export default function AdminDashboardClient({
   currentUserRole,
   formattedUsers,
   formattedAttendances,
+  formattedParentAttendances = [],
   overviewContent,
   user,
 }: AdminDashboardClientProps) {
-  // Mobile Tab: "dashboard" (overview & stats), "users" (Manajemen Murid & Guru), "approval" (Persetujuan Presensi)
-  const [mobileTab, setMobileTab] = useState<"dashboard" | "users" | "approval">("dashboard");
+  // Mobile Tab: "dashboard" (overview & stats), "users" (Manajemen Murid & Guru), "approval" (Persetujuan Presensi), "orangtua" (Absensi Orang Tua)
+  const [mobileTab, setMobileTab] = useState<"dashboard" | "users" | "approval" | "orangtua">("dashboard");
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
 
   useEffect(() => {
@@ -100,6 +103,7 @@ export default function AdminDashboardClient({
           initialAttendances={formattedAttendances}
           users={formattedUsers}
         />
+        <ParentAttendanceTable initialRecords={formattedParentAttendances} />
       </div>
 
       {/* ========================================================= */}
@@ -110,16 +114,27 @@ export default function AdminDashboardClient({
         {mobileTab === "dashboard" && (
           <div className="space-y-4 animate-in fade-in duration-200">
             {/* Header Mobile dengan Profil & Lonceng Notifikasi */}
-            <div className="flex items-center justify-between bg-white/90 backdrop-blur-md p-3 rounded-2xl border border-sky-100 shadow-xs">
+            <div className="flex items-center justify-between bg-white/90 backdrop-blur-md p-3 rounded-2xl border border-emerald-100 shadow-xs">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white font-extrabold text-xs shadow-xs">
-                  {user?.name ? user.name.charAt(0).toUpperCase() : "A"}
-                </div>
+                {user?.image ? (
+                  <div className="relative w-8 h-8 rounded-xl overflow-hidden shadow-xs border border-emerald-200 shrink-0">
+                    <Image
+                      src={user.image}
+                      alt={user.name || "Foto Profil"}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-600 flex items-center justify-center text-white font-extrabold text-xs shadow-xs shrink-0">
+                    {user?.name ? user.name.charAt(0).toUpperCase() : "A"}
+                  </div>
+                )}
                 <div>
                   <h3 className="text-xs font-black text-slate-800 leading-tight">
                     {user?.name || "Administrator"}
                   </h3>
-                  <p className="text-[10px] text-sky-600 font-bold uppercase tracking-wider">
+                  <p className="text-[10px] text-emerald-600 font-bold uppercase tracking-wider">
                     {currentUserRole}
                   </p>
                 </div>
@@ -202,33 +217,53 @@ export default function AdminDashboardClient({
             />
           </div>
         )}
+
+        {/* TAB 4: ABSENSI ORANG TUA (HALAMAN SENDIRI) */}
+        {mobileTab === "orangtua" && (
+          <div className="space-y-4 animate-in fade-in duration-200">
+            {/* Header Kembali ke Dashboard */}
+            <div className="flex items-center gap-2.5 bg-white p-3 rounded-2xl border border-slate-200 shadow-xs">
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileTab("dashboard");
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+                className="w-8 h-8 flex items-center justify-center rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition"
+                aria-label="Kembali ke Dashboard"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <div>
+                <h2 className="text-sm font-extrabold text-slate-900 leading-tight">
+                  Absensi Orang Tua
+                </h2>
+                <p className="text-[10px] text-slate-500">
+                  Riwayat Kunjungan Orang Tua / Wali Murid
+                </p>
+              </div>
+            </div>
+
+            <ParentAttendanceTable initialRecords={formattedParentAttendances} />
+          </div>
+        )}
       </div>
 
       {/* ========================================================= */}
       {/* 3. MOBILE BOTTOM NAVIGATION (HANYA MUNCUL DI MOBILE / SM:HIDDEN) */}
       {/* ========================================================= */}
-      <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-2xl border-t border-sky-200/70 px-2 py-2.5 shadow-[0_-8px_30px_rgba(56,189,248,0.15)] safe-area-pb">
+      <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-2xl border-t border-emerald-200/70 px-2 py-2.5 shadow-[0_-8px_30px_rgba(16,185,129,0.15)] safe-area-pb">
         <div className="flex items-center justify-around max-w-md mx-auto">
-          {/* 1. Akun (Edit Profil) */}
-          <button
-            type="button"
-            onClick={() => setIsEditProfileOpen(true)}
-            className="flex flex-col items-center gap-1 py-1 px-2.5 rounded-2xl text-slate-500 hover:text-slate-800 transition"
-          >
-            <UserCheck2 className="w-5 h-5 text-sky-600 stroke-[1.8]" />
-            <span className="text-[10px] font-medium tracking-tight">Akun</span>
-          </button>
-
-          {/* 2. Dashboard Tab */}
+          {/* 1. Dashboard Tab */}
           <button
             type="button"
             onClick={() => {
               setMobileTab("dashboard");
               window.scrollTo({ top: 0, behavior: "smooth" });
             }}
-            className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-2xl transition-all ${
+            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-2xl transition-all ${
               mobileTab === "dashboard"
-                ? "text-sky-600 font-black scale-105 bg-sky-50 shadow-xs"
+                ? "text-emerald-600 font-black scale-105 bg-emerald-50 shadow-xs"
                 : "text-slate-500 hover:text-slate-800 font-medium"
             }`}
           >
@@ -236,16 +271,16 @@ export default function AdminDashboardClient({
             <span className="text-[10px] tracking-tight">Dashboard</span>
           </button>
 
-          {/* 3. Murid & Guru Tab */}
+          {/* 2. Murid & Guru Tab */}
           <button
             type="button"
             onClick={() => {
               setMobileTab("users");
               window.scrollTo({ top: 0, behavior: "smooth" });
             }}
-            className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-2xl transition-all ${
+            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-2xl transition-all ${
               mobileTab === "users"
-                ? "text-sky-600 font-black scale-105 bg-sky-50 shadow-xs"
+                ? "text-emerald-600 font-black scale-105 bg-emerald-50 shadow-xs"
                 : "text-slate-500 hover:text-slate-800 font-medium"
             }`}
           >
@@ -253,14 +288,14 @@ export default function AdminDashboardClient({
             <span className="text-[10px] tracking-tight">Murid &amp; Guru</span>
           </button>
 
-          {/* 4. Persetujuan / Approval Tab */}
+          {/* 3. Persetujuan / Approval Tab */}
           <button
             type="button"
             onClick={() => {
               setMobileTab("approval");
               window.scrollTo({ top: 0, behavior: "smooth" });
             }}
-            className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-2xl transition-all ${
+            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-2xl transition-all ${
               mobileTab === "approval"
                 ? "text-emerald-600 font-black scale-105 bg-emerald-50 shadow-xs"
                 : "text-slate-500 hover:text-slate-800 font-medium"
@@ -270,14 +305,21 @@ export default function AdminDashboardClient({
             <span className="text-[10px] tracking-tight">Approval</span>
           </button>
 
-          {/* 5. Keluar / Logout */}
+          {/* 4. Orang Tua Tab */}
           <button
             type="button"
-            onClick={() => signOut({ callbackUrl: "/login" })}
-            className="flex flex-col items-center gap-1 py-1 px-2.5 rounded-2xl text-rose-500 hover:text-rose-600 transition"
+            onClick={() => {
+              setMobileTab("orangtua");
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-2xl transition-all ${
+              mobileTab === "orangtua"
+                ? "text-orange-600 font-black scale-105 bg-orange-50 shadow-xs"
+                : "text-slate-500 hover:text-slate-800 font-medium"
+            }`}
           >
-            <LogOut className="w-5 h-5 stroke-[1.8]" />
-            <span className="text-[10px] font-medium tracking-tight">Keluar</span>
+            <Users2 className="w-5 h-5 stroke-[1.8]" />
+            <span className="text-[10px] tracking-tight">Ortu</span>
           </button>
         </div>
       </nav>
@@ -304,3 +346,5 @@ export default function AdminDashboardClient({
     </div>
   );
 }
+
+

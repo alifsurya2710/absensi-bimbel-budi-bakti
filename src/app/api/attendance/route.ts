@@ -63,7 +63,7 @@ export async function POST(req: Request) {
       const userName = attendance.user.name || attendance.user.username || "Pengguna";
       const kelasInfo = attendance.user.kelas ? ` [${attendance.user.kelas}]` : "";
 
-      let notifTitle = `🔔 PRESENSI BARU - BIMBEL BUDI BAKTI`;
+      let notifTitle = `🔔 PRESENSI BARU - FORSIREMIS`;
       let statusDesc = "Hadir";
 
       if (status === "IZIN") {
@@ -118,4 +118,5 @@ Waktu: ${notifTime} WIB`;
     );
   }
 }
+
 

@@ -4,13 +4,13 @@ import { SessionProvider } from 'next-auth/react';
 import MobileSplashScreen from '@/components/MobileSplashScreen';
 
 export const metadata: Metadata = {
-  title: 'Absensi Bimbel BUDI BAKTI',
-  description: 'Sistem Informasi Presensi & Akademik Bimbel BUDI BAKTI',
+  title: 'FORSIREMIS - Presensi & Akademik',
+  description: 'Sistem Informasi Presensi & Akademik FORSIREMIS - Bimbingan Latihan Persiapan Menuju PTN',
   manifest: '/manifest.json',
   icons: {
-    icon: '/logo.jpg',
-    shortcut: '/logo.jpg',
-    apple: '/logo.jpg',
+    icon: '/logo-forsiremis.png',
+    shortcut: '/logo-forsiremis.png',
+    apple: '/logo-forsiremis.png',
   },
 };
 

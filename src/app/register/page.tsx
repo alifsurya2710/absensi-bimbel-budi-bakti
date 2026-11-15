@@ -130,30 +130,30 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="relative flex min-h-screen bg-gradient-to-b from-sky-50 via-white to-sky-100/60 font-sans p-4 sm:p-6 md:p-12 items-start sm:items-center justify-center overflow-hidden">
+    <div className="relative flex min-h-screen bg-gradient-to-b from-emerald-50 via-white to-emerald-100/60 font-sans p-4 sm:p-6 md:p-12 items-start sm:items-center justify-center overflow-hidden">
       {/* 3D Background */}
       <Interactive3DBackground />
 
-      <div className="w-full max-w-xl bg-white/90 backdrop-blur-2xl rounded-3xl shadow-[0_20px_50px_rgba(56,189,248,0.18)] p-5 sm:p-8 md:p-10 border border-sky-100/90 ring-1 ring-sky-200/50 my-4 sm:my-0 relative z-10">
+      <div className="w-full max-w-xl bg-white/90 backdrop-blur-2xl rounded-3xl shadow-[0_20px_50px_rgba(16,185,129,0.18)] p-5 sm:p-8 md:p-10 border border-emerald-100/90 ring-1 ring-emerald-200/50 my-4 sm:my-0 relative z-10">
         {/* Brand */}
         <div className="mb-5 pb-4 border-b border-slate-100">
           <div className="flex items-center justify-between gap-3">
             <Link href="/" className="flex items-center gap-2.5 hover:opacity-85 transition shrink-0">
               <Image
-                src="/logo.jpg"
-                alt="Logo Bimbel BUDI BAKTI"
+                src="/logo-forsiremis.png"
+                alt="Logo FORSIREMIS"
                 width={36}
                 height={36}
                 className="rounded-xl object-cover shadow-sm shrink-0"
               />
               <div>
-                <h1 className="text-xs sm:text-lg font-bold text-slate-800 leading-tight whitespace-nowrap">Bimbel BUDI BAKTI</h1>
+                <h1 className="text-xs sm:text-lg font-bold text-slate-800 leading-tight whitespace-nowrap">FORSIREMIS</h1>
                 <p className="text-[10px] sm:text-xs text-slate-400 leading-tight">Registrasi Akun Baru</p>
               </div>
             </Link>
             <Link
               href="/login"
-              className="shrink-0 text-[11px] sm:text-xs font-semibold text-indigo-600 hover:text-indigo-700 whitespace-nowrap transition"
+              className="shrink-0 text-[11px] sm:text-xs font-semibold text-emerald-600 hover:text-emerald-700 whitespace-nowrap transition"
             >
               Sudah punya akun? Masuk
             </Link>
@@ -171,7 +171,7 @@ export default function RegisterPage() {
               onClick={() => setRole("MURID")}
               className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition ${
                 role === "MURID"
-                  ? "bg-white text-indigo-600 shadow-sm"
+                  ? "bg-white text-emerald-600 shadow-sm"
                   : "text-slate-600 hover:text-slate-900"
               }`}
             >
@@ -214,7 +214,7 @@ export default function RegisterPage() {
                 <img
                   src={imagePreview}
                   alt="Preview Profil"
-                  className="w-16 h-16 rounded-full object-cover border-2 border-indigo-500"
+                  className="w-16 h-16 rounded-full object-cover border-2 border-emerald-500"
                 />
               ) : (
                 <div className="w-16 h-16 rounded-full bg-slate-200 flex items-center justify-center text-slate-400 border border-slate-300">
@@ -267,7 +267,7 @@ export default function RegisterPage() {
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition"
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 focus:outline-none transition"
                 placeholder={role === "MURID" ? "Contoh: Budi Pratama" : "Contoh: Ahmad Fauzi, S.Pd"}
               />
             </div>
@@ -286,7 +286,7 @@ export default function RegisterPage() {
                   required
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 focus:outline-none transition"
                   placeholder="budi_pratama"
                 />
               </div>
@@ -304,7 +304,7 @@ export default function RegisterPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 focus:outline-none transition"
                   placeholder="budi@example.com"
                 />
               </div>
@@ -324,7 +324,7 @@ export default function RegisterPage() {
                   required
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 focus:outline-none transition"
                   placeholder="081234567890"
                 />
               </div>
@@ -343,7 +343,7 @@ export default function RegisterPage() {
                     required
                     value={kelas}
                     onChange={(e) => setKelas(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 focus:outline-none transition"
                     placeholder="XII RPL 1"
                   />
                 </div>
@@ -363,7 +363,7 @@ export default function RegisterPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-10 pr-11 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition"
+                className="w-full pl-10 pr-11 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 focus:outline-none transition"
                 placeholder="Minimal 8 karakter unik..."
               />
               <button
@@ -415,7 +415,7 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={loading || !isPasswordValid || !isCaptchaValid}
-            className="w-full mt-4 flex items-center justify-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 py-3 text-sm font-semibold text-white shadow-md shadow-indigo-200 transition disabled:opacity-50"
+            className="w-full mt-4 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 py-3 text-sm font-semibold text-white shadow-md shadow-emerald-200 transition disabled:opacity-50"
           >
             {loading ? (
               <>
@@ -434,3 +434,6 @@ export default function RegisterPage() {
     </div>
   );
 }
+
+
+

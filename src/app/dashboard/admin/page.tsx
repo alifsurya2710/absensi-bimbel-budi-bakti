@@ -8,9 +8,12 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminDashboard() {
   const session = await auth();
-  const [muridCount, guruCount, attendancesList, managedUsers] = await Promise.all([
-    prisma.user.count({ where: { role: "MURID" } }),
-    prisma.user.count({ where: { role: "GURU" } }),
+  const [roleCounts, attendancesList, managedUsers, parentAttendances, dbUser] = await Promise.all([
+    prisma.user.groupBy({
+      by: ["role"],
+      where: { role: { in: ["GURU", "MURID"] } },
+      _count: { _all: true },
+    }),
     prisma.attendance.findMany({
       include: { user: true },
       orderBy: { createdAt: "desc" },
@@ -28,6 +31,7 @@ export default async function AdminDashboard() {
         phone: true,
         role: true,
         kelas: true,
+        image: true,
         createdAt: true,
         _count: {
           select: {
@@ -37,7 +41,45 @@ export default async function AdminDashboard() {
       },
       orderBy: { createdAt: "desc" },
     }),
+    prisma.parentAttendance.findMany({
+      include: {
+        student: {
+          select: {
+            id: true,
+            name: true,
+            username: true,
+            kelas: true,
+            image: true,
+            phone: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+      take: 30,
+    }),
+    session?.user?.id
+      ? prisma.user.findUnique({
+          where: { id: session.user.id },
+          select: {
+            id: true,
+            name: true,
+            username: true,
+            email: true,
+            phone: true,
+            role: true,
+            kelas: true,
+            image: true,
+          },
+        })
+      : Promise.resolve(null),
   ]);
+
+  const countMap: Record<string, number> = {};
+  for (const item of roleCounts) {
+    countMap[item.role] = item._count._all;
+  }
+  const muridCount = countMap["MURID"] || 0;
+  const guruCount = countMap["GURU"] || 0;
 
   const formattedUsers = managedUsers.map((u) => ({
     ...u,
@@ -62,32 +104,33 @@ export default async function AdminDashboard() {
     },
   }));
 
-  const dbUser = session?.user?.id
-    ? await prisma.user.findUnique({
-        where: { id: session.user.id },
-        select: {
-          id: true,
-          name: true,
-          username: true,
-          email: true,
-          phone: true,
-          role: true,
-          kelas: true,
-          image: true,
-        },
-      })
-    : null;
+  const formattedParentAttendances = parentAttendances.map((p) => ({
+    id: p.id,
+    parentName: p.parentName,
+    parentPhone: p.parentPhone,
+    status: p.status as "HADIR" | "BELUM_HADIR" | "IZIN" | "SAKIT" | "TIDAK_HADIR",
+    notes: p.notes,
+    createdAt: p.createdAt.toISOString(),
+    student: {
+      id: p.student.id,
+      name: p.student.name,
+      username: p.student.username,
+      kelas: p.student.kelas,
+      image: p.student.image,
+      phone: p.student.phone,
+    },
+  }));
 
   const overviewContent = (
     <div className="space-y-6 sm:space-y-8">
       {/* Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-indigo-800 p-6 sm:p-8 text-white shadow-lg">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-emerald-700 via-green-700 to-teal-800 p-6 sm:p-8 text-white shadow-lg">
         <div className="relative z-10 max-w-2xl">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold backdrop-blur-md">
             <Users className="w-3.5 h-3.5" /> Portal Staf Administrasi
           </span>
           <h1 className="mt-3 text-2xl font-bold sm:text-3xl">Pusat Monitoring Kehadiran</h1>
-          <p className="mt-2 text-blue-100 text-sm leading-relaxed">
+          <p className="mt-2 text-emerald-100 text-sm leading-relaxed">
             Kelola data akun siswa dan guru, lakukan verifikasi/approval kehadiran selfie, dan pantau rekapitulasi data Excel secara mudah.
           </p>
         </div>
@@ -101,7 +144,7 @@ export default async function AdminDashboard() {
         <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-xs">
           <div className="flex items-center justify-between">
             <p className="text-sm font-medium text-slate-500">Jumlah Siswa Bimbel</p>
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
               <GraduationCap className="w-5 h-5" />
             </div>
           </div>
@@ -112,7 +155,7 @@ export default async function AdminDashboard() {
         <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-xs">
           <div className="flex items-center justify-between">
             <p className="text-sm font-medium text-slate-500">Jumlah Guru / Tutor</p>
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-teal-50 text-teal-600">
               <UserCheck className="w-5 h-5" />
             </div>
           </div>
@@ -137,7 +180,7 @@ export default async function AdminDashboard() {
   return (
     <DashboardShell
       activeRole="ADMIN"
-      title="Manajemen Presensi Bimbel BUDI BAKTI"
+      title="Manajemen Presensi FORSIREMIS"
       user={{
         id: dbUser?.id || session?.user?.id || "",
         name: dbUser?.name || session?.user?.name,
@@ -152,6 +195,7 @@ export default async function AdminDashboard() {
         currentUserRole="ADMIN"
         formattedUsers={formattedUsers}
         formattedAttendances={formattedAttendances}
+        formattedParentAttendances={formattedParentAttendances}
         overviewContent={overviewContent}
         user={{
           id: dbUser?.id || session?.user?.id || "",
@@ -166,3 +210,5 @@ export default async function AdminDashboard() {
     </DashboardShell>
   );
 }
+
+

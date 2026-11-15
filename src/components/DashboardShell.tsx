@@ -75,9 +75,9 @@ export default function DashboardShell({
       avatar: "bg-rose-500",
     },
     ADMIN: {
-      badge: "bg-blue-100 text-blue-700 border-blue-200",
-      accent: "from-blue-600 to-indigo-700",
-      avatar: "bg-blue-500",
+      badge: "bg-teal-100 text-teal-700 border-teal-200",
+      accent: "from-teal-600 to-emerald-700",
+      avatar: "bg-teal-500",
     },
   };
 
@@ -115,13 +115,13 @@ export default function DashboardShell({
             {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
           <Image
-            src="/logo.jpg"
-            alt="Logo Bimbel BUDI BAKTI"
+            src="/logo-forsiremis.png"
+            alt="Logo FORSIREMIS"
             width={32}
             height={32}
             className="rounded-lg object-cover shadow-xs"
           />
-          <span className={`font-bold text-xs sm:text-sm ${isDarkMode ? "text-white" : "text-slate-800"}`}>Bimbel BUDI BAKTI</span>
+          <span className={`font-bold text-xs sm:text-sm ${isDarkMode ? "text-white" : "text-slate-800"}`}>FORSIREMIS</span>
         </div>
 
         <div className="flex items-center gap-2">
@@ -160,14 +160,14 @@ export default function DashboardShell({
         <div className={`p-5 sm:p-6 border-b flex items-center justify-between ${isDarkMode ? "border-slate-800" : "border-slate-100"}`}>
           <div className="flex items-center gap-3">
             <Image
-              src="/logo.jpg"
-              alt="Logo Bimbel BUDI BAKTI"
+              src="/logo-forsiremis.png"
+              alt="Logo FORSIREMIS"
               width={40}
               height={40}
               className="rounded-xl object-cover shadow-sm"
             />
             <div>
-              <h1 className={`text-base font-bold leading-tight ${isDarkMode ? "text-white" : "text-slate-800"}`}>Bimbel BUDI BAKTI</h1>
+              <h1 className={`text-base font-bold leading-tight ${isDarkMode ? "text-white" : "text-slate-800"}`}>FORSIREMIS</h1>
               <p className="text-xs text-slate-400 font-medium">Panel Manajemen Presensi</p>
             </div>
           </div>
@@ -217,7 +217,7 @@ export default function DashboardShell({
             }}
             className={`w-full flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl border text-xs font-semibold transition shadow-2xs ${isDarkMode ? "bg-slate-700 border-slate-600 text-slate-200 hover:bg-slate-600" : "bg-white border-slate-200 text-slate-700 hover:bg-slate-100"}`}
           >
-            <UserCheck2 className="w-3.5 h-3.5 text-indigo-500" />
+            <UserCheck2 className="w-3.5 h-3.5 text-emerald-600" />
             <span>Edit Profil Saya</span>
           </button>
         </div>
@@ -305,7 +305,7 @@ export default function DashboardShell({
                   : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
               }`}
             >
-              <UserCheck2 className="w-3.5 h-3.5 text-indigo-500" />
+              <UserCheck2 className="w-3.5 h-3.5 text-emerald-600" />
               <span>Edit Profil</span>
             </button>
 
@@ -354,3 +354,4 @@ export default function DashboardShell({
     </div>
   );
 }
+

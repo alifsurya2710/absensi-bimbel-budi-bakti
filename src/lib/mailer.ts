@@ -31,13 +31,13 @@ export async function sendOtpPasswordEmail(to: string, otpCode: string, userName
   }
 
   const mailOptions = {
-    from: `"Absensi Bimbel BUDI BAKTI" <${process.env.GMAIL_USER || "no-reply@budibakti.sch.id"}>`,
+    from: `"FORSIREMIS" <${process.env.GMAIL_USER || "no-reply@forsiremis.com"}>`,
     to,
     subject: `${otpCode} adalah Kode Verifikasi OTP Reset Kata Sandi Anda`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 540px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 16px; background-color: #ffffff;">
         <div style="text-align: center; margin-bottom: 24px;">
-          <h2 style="color: #4338ca; margin: 0;">Absensi Bimbel BUDI BAKTI</h2>
+          <h2 style="color: #4338ca; margin: 0;">FORSIREMIS</h2>
           <p style="color: #64748b; font-size: 13px; margin-top: 4px;">Verifikasi Reset Kata Sandi Akun</p>
         </div>
 
@@ -59,7 +59,7 @@ export async function sendOtpPasswordEmail(to: string, otpCode: string, userName
 
         <hr style="border: none; border-top: 1px solid #f1f5f9; margin: 24px 0;" />
         <p style="color: #94a3b8; font-size: 11px; text-align: center;">
-          © ${new Date().getFullYear()} Bimbel BUDI BAKTI. Seluruh hak cipta dilindungi.
+          © ${new Date().getFullYear()} FORSIREMIS. Seluruh hak cipta dilindungi.
         </p>
       </div>
     `,
@@ -76,4 +76,6 @@ export async function sendOtpPasswordEmail(to: string, otpCode: string, userName
 
   return { messageId: info.messageId, previewUrl };
 }
+
+
 

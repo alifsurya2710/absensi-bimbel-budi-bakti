@@ -123,13 +123,13 @@ export async function GET(req: Request) {
     // 1. Template Contoh Import User
     if (mode === "template") {
       const workbook = new ExcelJS.Workbook();
-      workbook.creator = "Bimbel BUDI BAKTI";
+      workbook.creator = "FORSIREMIS";
       const worksheet = workbook.addWorksheet("Template_User");
 
       // Title Banner
       worksheet.mergeCells("A1:F1");
       const titleCell = worksheet.getCell("A1");
-      titleCell.value = "TEMPLATE IMPORT DATA PENGGUNA - BIMBEL BUDI BAKTI";
+      titleCell.value = "TEMPLATE IMPORT DATA PENGGUNA - FORSIREMIS";
       titleCell.font = { name: "Arial", size: 14, bold: true, color: { argb: "FFFFFFFF" } };
       titleCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF1E3A8A" } }; // Deep Navy Blue
       titleCell.alignment = { vertical: "middle", horizontal: "center" };
@@ -201,7 +201,7 @@ export async function GET(req: Request) {
     }
 
     // 2. Export Rekapitulasi Presensi Lengkap & Terurut (Professional Royal Blue)
-    const [usersWithStats, allAttendances] = await Promise.all([
+    const [usersWithStats, allAttendances, allParentAttendances] = await Promise.all([
       prisma.user.findMany({
         where: {
           role: { in: ["GURU", "MURID"] },
@@ -222,6 +222,19 @@ export async function GET(req: Request) {
               name: true,
               username: true,
               role: true,
+              kelas: true,
+              phone: true,
+            },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.parentAttendance.findMany({
+        include: {
+          student: {
+            select: {
+              name: true,
+              username: true,
               kelas: true,
               phone: true,
             },
@@ -260,13 +273,13 @@ export async function GET(req: Request) {
     exportRows.sort((a, b) => b.total - a.total);
 
     const workbook = new ExcelJS.Workbook();
-    workbook.creator = "Bimbel BUDI BAKTI";
+    workbook.creator = "FORSIREMIS";
     const worksheet = workbook.addWorksheet("Rekapitulasi Keaktifan");
 
     // Title Row 1: Banner Header Utama
     worksheet.mergeCells("A1:L1");
     const titleCell = worksheet.getCell("A1");
-    titleCell.value = "REKAPITULASI KEAKTIFAN PRESENSI - BIMBEL BUDI BAKTI";
+    titleCell.value = "REKAPITULASI KEAKTIFAN PRESENSI - FORSIREMIS";
     titleCell.font = { name: "Arial", size: 14, bold: true, color: { argb: "FFFFFFFF" } };
     titleCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF1E3A8A" } }; // Deep Royal Navy Blue (#1e3a8a)
     titleCell.alignment = { vertical: "middle", horizontal: "center" };
@@ -382,7 +395,7 @@ export async function GET(req: Request) {
     // Title Row 1 Sheet 2: Banner Header
     detailSheet.mergeCells("A1:K1");
     const detailTitleCell = detailSheet.getCell("A1");
-    detailTitleCell.value = "LOG DETAIL PRESENSI & PERSETUJUAN (APPROVAL) - BIMBEL BUDI BAKTI";
+    detailTitleCell.value = "LOG DETAIL PRESENSI & PERSETUJUAN (APPROVAL) - FORSIREMIS";
     detailTitleCell.font = { name: "Arial", size: 14, bold: true, color: { argb: "FFFFFFFF" } };
     detailTitleCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF0F766E" } }; // Deep Teal (#0f766e)
     detailTitleCell.alignment = { vertical: "middle", horizontal: "center" };
@@ -502,6 +515,128 @@ export async function GET(req: Request) {
       });
     });
 
+    // ==========================================
+    // SHEET 3: REKAPITULASI ABSENSI ORANG TUA / WALI
+    // ==========================================
+    const parentSheet = workbook.addWorksheet("Absensi_Orang_Tua");
+
+    // Title Banner Sheet 3
+    parentSheet.mergeCells("A1:I1");
+    const parentTitleCell = parentSheet.getCell("A1");
+    parentTitleCell.value = "REKAPITULASI KUNJUNGAN & PRESENSI ORANG TUA / WALI MURID";
+    parentTitleCell.font = { name: "Arial", size: 14, bold: true, color: { argb: "FFFFFFFF" } };
+    parentTitleCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFC2410C" } }; // Deep Orange / Amber
+    parentTitleCell.alignment = { vertical: "middle", horizontal: "center" };
+    parentSheet.getRow(1).height = 36;
+
+    // Subtitle Sheet 3
+    parentSheet.mergeCells("A2:I2");
+    const parentSubCell = parentSheet.getCell("A2");
+    parentSubCell.value = `FORSIREMIS • Diekspor pada: ${new Date().toLocaleDateString("id-ID", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    })} • Total Kunjungan: ${allParentAttendances.length}`;
+    parentSubCell.font = { name: "Arial", size: 9, italic: true, color: { argb: "FF475569" } };
+    parentSubCell.alignment = { vertical: "middle", horizontal: "center" };
+    parentSheet.getRow(2).height = 24;
+
+    // Empty separator
+    parentSheet.addRow([]);
+    parentSheet.getRow(3).height = 10;
+
+    // Columns Configuration Sheet 3
+    const parentColumnsConfig = [
+      { header: "No", key: "no", width: 7 },
+      { header: "Tanggal", key: "date", width: 16 },
+      { header: "Waktu", key: "time", width: 12 },
+      { header: "Nama Siswa (Murid)", key: "studentName", width: 26 },
+      { header: "Kelas Siswa", key: "studentKelas", width: 16 },
+      { header: "Nama Orang Tua / Wali", key: "parentName", width: 26 },
+      { header: "No. HP Orang Tua", key: "parentPhone", width: 20 },
+      { header: "Status Kehadiran", key: "status", width: 18 },
+      { header: "Keterangan / Catatan", key: "notes", width: 34 },
+    ];
+
+    // Table Header Row 4 Sheet 3
+    const parentHeaderRow = parentSheet.getRow(4);
+    parentHeaderRow.height = 28;
+    parentColumnsConfig.forEach((col, idx) => {
+      const cell = parentHeaderRow.getCell(idx + 1);
+      cell.value = col.header;
+      cell.font = { name: "Arial", size: 11, bold: true, color: { argb: "FFFFFFFF" } };
+      cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFEA580C" } }; // Warm Orange Accent
+      cell.alignment = { vertical: "middle", horizontal: "center", wrapText: true };
+      cell.border = {
+        top: { style: "medium", color: { argb: "FF9A3412" } },
+        left: { style: "thin", color: { argb: "FFFED7AA" } },
+        bottom: { style: "medium", color: { argb: "FF9A3412" } },
+        right: { style: "thin", color: { argb: "FFFED7AA" } },
+      };
+      parentSheet.getColumn(idx + 1).width = col.width;
+    });
+
+    // Populate Data Rows Sheet 3
+    allParentAttendances.forEach((pAtt, index) => {
+      const createdDate = new Date(pAtt.createdAt);
+      const dateStr = createdDate.toLocaleDateString("id-ID", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      });
+      const timeStr = createdDate.toLocaleTimeString("id-ID", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+
+      const row = parentSheet.addRow([
+        index + 1,
+        dateStr,
+        timeStr,
+        pAtt.student?.name || "-",
+        pAtt.student?.kelas || "-",
+        pAtt.parentName,
+        pAtt.parentPhone || "-",
+        pAtt.status.replace("_", " "),
+        pAtt.notes || "-",
+      ]);
+      row.height = 22;
+
+      const isEven = index % 2 === 1;
+      const rowBgColor = isEven ? "FFFFF7ED" : "FFFFFFFF"; // Very Soft Warm Tint / White
+
+      row.eachCell((cell, colNumber) => {
+        cell.font = { name: "Arial", size: 10, color: { argb: "FF1E293B" } };
+        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: rowBgColor } };
+
+        cell.border = {
+          top: { style: "thin", color: { argb: "FFE2E8F0" } },
+          left: { style: "thin", color: { argb: "FFE2E8F0" } },
+          bottom: { style: "thin", color: { argb: "FFE2E8F0" } },
+          right: { style: "thin", color: { argb: "FFE2E8F0" } },
+        };
+
+        // Alignment format
+        if (colNumber === 1 || colNumber === 2 || colNumber === 3 || colNumber === 5) {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        } else if (colNumber === 8) {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+          // Status color formatting
+          if (pAtt.status === "HADIR") {
+            cell.font = { name: "Arial", size: 10, bold: true, color: { argb: "FF047857" } };
+          } else if (pAtt.status === "IZIN" || pAtt.status === "SAKIT") {
+            cell.font = { name: "Arial", size: 10, bold: true, color: { argb: "FF2563EB" } };
+          } else {
+            cell.font = { name: "Arial", size: 10, bold: true, color: { argb: "FFB91C1C" } };
+          }
+        } else {
+          cell.alignment = { vertical: "middle", horizontal: "left" };
+        }
+      });
+    });
+
     const buffer = await workbook.xlsx.writeBuffer();
 
     return new NextResponse(buffer, {
@@ -515,3 +650,4 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Gagal mengunduh data Excel" }, { status: 500 });
   }
 }
+

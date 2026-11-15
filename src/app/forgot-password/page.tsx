@@ -181,16 +181,16 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="relative flex min-h-screen bg-gradient-to-b from-sky-50 via-white to-sky-100/60 font-sans p-4 sm:p-6 md:p-12 items-center justify-center overflow-hidden">
+    <div className="relative flex min-h-screen bg-gradient-to-b from-emerald-50 via-white to-emerald-100/60 font-sans p-4 sm:p-6 md:p-12 items-center justify-center overflow-hidden">
       <Interactive3DBackground />
 
-      <div className="w-full max-w-md bg-white/90 backdrop-blur-2xl rounded-3xl shadow-[0_20px_50px_rgba(56,189,248,0.18)] p-6 sm:p-8 md:p-10 border border-sky-100/90 ring-1 ring-sky-200/50 relative z-10">
+      <div className="w-full max-w-md bg-white/90 backdrop-blur-2xl rounded-3xl shadow-[0_20px_50px_rgba(16,185,129,0.18)] p-6 sm:p-8 md:p-10 border border-emerald-100/90 ring-1 ring-emerald-200/50 relative z-10">
         
         {/* Header Sesuai Desain Asli (Logo Bimbel + Judul) */}
         <Link href="/" className="flex items-center gap-3 mb-6 hover:opacity-85 transition">
           <Image
-            src="/logo.jpg"
-            alt="Logo Bimbel BUDI BAKTI"
+            src="/logo-forsiremis.png"
+            alt="Logo FORSIREMIS"
             width={40}
             height={40}
             className="rounded-xl object-cover shadow-sm shrink-0"
@@ -199,7 +199,7 @@ export default function ForgotPasswordPage() {
             <h1 className="text-base sm:text-xl font-bold text-slate-800 leading-tight">
               {step === 1 ? "Lupa Kata Sandi" : "Verifikasi Kode OTP"}
             </h1>
-            <p className="text-xs text-slate-400">Absensi Bimbel BUDI BAKTI</p>
+            <p className="text-xs text-slate-400">FORSIREMIS</p>
           </div>
         </Link>
 
@@ -208,7 +208,7 @@ export default function ForgotPasswordPage() {
             "Masukkan alamat Gmail atau email akun Anda. Kami akan mengirimkan kode 6 digit OTP resmi untuk mengatur ulang kata sandi."
           ) : (
             <span>
-              Kode 6 digit telah dikirimkan ke <strong className="text-indigo-600 font-bold">{email}</strong>. Silakan masukkan kode dan kata sandi baru Anda.
+              Kode 6 digit telah dikirimkan ke <strong className="text-emerald-600 font-bold">{email}</strong>. Silakan masukkan kode dan kata sandi baru Anda.
             </span>
           )}
         </p>
@@ -242,7 +242,7 @@ export default function ForgotPasswordPage() {
                   placeholder="contoh@gmail.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 focus:outline-none transition"
                 />
               </div>
             </div>
@@ -250,7 +250,7 @@ export default function ForgotPasswordPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 py-3 text-sm font-semibold text-white shadow-md shadow-indigo-200 transition disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 py-3 text-sm font-semibold text-white shadow-md shadow-emerald-200 transition disabled:opacity-50"
             >
               {loading ? (
                 <>
@@ -285,7 +285,7 @@ export default function ForgotPasswordPage() {
                 <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
                   Kode Verifikasi (OTP)
                 </label>
-                <div className="flex items-center gap-1 text-[11px] text-indigo-600 font-semibold">
+                <div className="flex items-center gap-1 text-[11px] text-emerald-600 font-semibold">
                   <KeyRound className="w-3.5 h-3.5" />
                   <span>6 Digit</span>
                 </div>
@@ -305,7 +305,7 @@ export default function ForgotPasswordPage() {
                     onChange={(e) => handleOtpChange(idx, e.target.value)}
                     onKeyDown={(e) => handleOtpKeyDown(idx, e)}
                     onPaste={idx === 0 ? handleOtpPaste : undefined}
-                    className="w-11 h-12 sm:w-12 sm:h-14 text-center text-lg sm:text-xl font-black bg-slate-50 border-2 border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-100 transition shadow-2xs"
+                    className="w-11 h-12 sm:w-12 sm:h-14 text-center text-lg sm:text-xl font-black bg-slate-50 border-2 border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-emerald-600 focus:bg-white focus:ring-4 focus:ring-emerald-100 transition shadow-2xs"
                   />
                 ))}
               </div>
@@ -316,7 +316,7 @@ export default function ForgotPasswordPage() {
                   <button
                     type="button"
                     onClick={() => handleRequestOtp()}
-                    className="text-xs font-bold text-indigo-600 hover:text-indigo-800 hover:underline transition"
+                    className="text-xs font-bold text-emerald-600 hover:text-emerald-800 hover:underline transition"
                   >
                     Kirim ulang kode OTP
                   </button>
@@ -342,7 +342,7 @@ export default function ForgotPasswordPage() {
                     href={previewUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="font-bold text-indigo-600 underline"
+                    className="font-bold text-emerald-600 underline"
                   >
                     [Simulator] Buka Kotak Masuk Gmail Simulator ↗
                   </a>
@@ -362,7 +362,7 @@ export default function ForgotPasswordPage() {
                   required
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full pl-10 pr-11 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition"
+                  className="w-full pl-10 pr-11 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 focus:outline-none transition"
                   placeholder="Buat kata sandi baru..."
                 />
                 <button
@@ -415,7 +415,7 @@ export default function ForgotPasswordPage() {
                   required
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 focus:outline-none transition"
                   placeholder="Ulangi kata sandi baru..."
                 />
               </div>
@@ -425,7 +425,7 @@ export default function ForgotPasswordPage() {
             <button
               type="submit"
               disabled={loading || !isPasswordValid || newPassword !== confirmPassword || otp.join("").length !== 6}
-              className="w-full mt-2 flex items-center justify-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 py-3 text-sm font-semibold text-white shadow-md shadow-indigo-200 transition disabled:opacity-50"
+              className="w-full mt-2 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 py-3 text-sm font-semibold text-white shadow-md shadow-emerald-200 transition disabled:opacity-50"
             >
               {loading ? (
                 <>
@@ -459,3 +459,6 @@ export default function ForgotPasswordPage() {
     </div>
   );
 }
+
+
+

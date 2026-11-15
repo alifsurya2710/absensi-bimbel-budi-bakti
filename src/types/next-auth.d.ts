@@ -23,3 +23,4 @@ declare module "next-auth/jwt" {
     role?: "SUPERADMIN" | "ADMIN" | "GURU" | "MURID";
   }
 }
+

@@ -93,17 +93,17 @@ export default function InstallPromptBanner() {
 
         {/* Konten Atas: Logo + Teks */}
         <div className="flex items-start gap-3.5 pr-6">
-          <div className="relative w-14 h-14 rounded-2xl overflow-hidden shrink-0 shadow-md ring-2 ring-indigo-50 bg-indigo-500">
+          <div className="relative w-14 h-14 rounded-2xl overflow-hidden shrink-0 shadow-md ring-2 ring-emerald-50 bg-emerald-500">
             <Image
-              src="/logo.jpg"
-              alt="Logo Bimbel BUDI BAKTI"
+              src="/logo-forsiremis.png"
+              alt="Logo FORSIREMIS"
               fill
               className="object-cover"
             />
           </div>
           <div>
             <h3 className="text-sm font-bold text-slate-900 leading-snug">
-              Pasang Bimbel BUDI BAKTI di HP Anda seperti aplikasi biasa?
+              Pasang FORSIREMIS di HP Anda seperti aplikasi biasa?
             </h3>
             <p className="text-xs text-slate-500 mt-1 leading-relaxed">
               Buka lebih cepat dari layar utama, tanpa repot buka browser.
@@ -123,7 +123,7 @@ export default function InstallPromptBanner() {
           <button
             type="button"
             onClick={handleInstallClick}
-            className="flex-1 py-2.5 rounded-full bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-500 hover:to-indigo-600 text-white text-xs font-bold transition shadow-md shadow-blue-500/25 flex items-center justify-center gap-1.5"
+            className="flex-1 py-2.5 rounded-full bg-gradient-to-r from-emerald-600 via-green-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 text-white text-xs font-bold transition shadow-md shadow-emerald-500/25 flex items-center justify-center gap-1.5"
           >
             <Download className="w-3.5 h-3.5 stroke-[2.5]" />
             Pasang
@@ -133,3 +133,4 @@ export default function InstallPromptBanner() {
     </div>
   );
 }
+
