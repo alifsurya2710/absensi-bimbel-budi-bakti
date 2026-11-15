@@ -84,6 +84,9 @@ export default function AttendanceClient({
   // Kontrol tampilan mobile: "home" = form presensi, "riwayat" = halaman riwayat penuh, "orangtua" = form absensi orang tua (khusus murid)
   const [mobileView, setMobileView] = useState<"home" | "riwayat" | "orangtua">("home");
   const [mobileShowCamera, setMobileShowCamera] = useState(false);
+  const [showDuplicateConfirm, setShowDuplicateConfirm] = useState(false);
+  const [deletingItemId, setDeletingItemId] = useState<string | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const [activePopup, setActivePopup] = useState<AttendanceRecord | null>(() => {
     if (initialHistory && initialHistory.length > 0) {
       const latest = initialHistory[0];
@@ -185,17 +188,9 @@ export default function AttendanceClient({
     };
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setSuccess("");
-
-    if (isPhotoRequired && !photo) {
-      setError(`Untuk status '${status}', Anda wajib menyertakan foto/selfie.`);
-      return;
-    }
-
+  const executeSubmit = async () => {
     setLoading(true);
+    setShowDuplicateConfirm(false);
 
     try {
       const res = await fetch("/api/attendance", {
@@ -223,6 +218,46 @@ export default function AttendanceClient({
       setError("Terjadi kendala koneksi ke server.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+
+    if (isPhotoRequired && !photo) {
+      setError(`Untuk status '${status}', Anda wajib menyertakan foto/selfie.`);
+      return;
+    }
+
+    // Periksa apakah pengguna sudah pernah mengisi presensi pada hari ini
+    const todayStr = new Date().toDateString();
+    const alreadyAttendedToday = history.some(
+      (item) => new Date(item.createdAt).toDateString() === todayStr
+    );
+
+    if (alreadyAttendedToday) {
+      setShowDuplicateConfirm(true);
+      return;
+    }
+
+    await executeSubmit();
+  };
+
+  const handleDeleteAttendance = async (id: string) => {
+    if (!id) return;
+    setDeleteLoading(true);
+    try {
+      const res = await fetch(`/api/attendance/${id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Gagal menghapus presensi.");
+      setHistory((prev) => prev.filter((item) => item.id !== id));
+      setDeletingItemId(null);
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Terjadi kesalahan.");
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -374,6 +409,17 @@ export default function AttendanceClient({
                           )}
                         </div>
                       )}
+                      {/* Tombol Hapus */}
+                      <div className="flex justify-end mt-1">
+                        <button
+                          type="button"
+                          onClick={() => setDeletingItemId(item.id)}
+                          className="p-1.5 rounded-lg border border-slate-200 hover:border-rose-300 hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition"
+                          title="Hapus Presensi"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
                   ))}
               </div>
@@ -736,12 +782,13 @@ export default function AttendanceClient({
                   <th className="px-6 py-3">Status Approval</th>
                   <th className="px-6 py-3">Foto / Bukti</th>
                   <th className="px-6 py-3">Keterangan</th>
+                  <th className="px-6 py-3 text-right">Aksi</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {history.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-8 text-center text-slate-400 italic">
+                    <td colSpan={6} className="px-6 py-8 text-center text-slate-400 italic">
                       Belum ada data kehadiran yang tercatat.
                     </td>
                   </tr>
@@ -821,6 +868,16 @@ export default function AttendanceClient({
                             Alasan: {item.rejectionReason}
                           </span>
                         )}
+                      </td>
+                      <td className="px-6 py-3.5 text-right">
+                        <button
+                          type="button"
+                          onClick={() => setDeletingItemId(item.id)}
+                          className="p-1.5 rounded-lg border border-slate-200 hover:border-rose-300 hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition"
+                          title="Hapus Presensi"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
                       </td>
                     </tr>
                   ))
@@ -1099,6 +1156,84 @@ export default function AttendanceClient({
           router.refresh();
         }}
       />
+
+      {/* Pop-up Peringatan Jika Mengisi Kehadiran 2 Kali */}
+      {showDuplicateConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-6 border border-amber-200 relative overflow-hidden animate-in zoom-in-95 duration-150">
+            <div className="flex items-start gap-3.5">
+              <div className="w-11 h-11 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
+                <AlertCircle className="w-6 h-6" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-base font-extrabold text-slate-900 leading-snug">
+                  Sudah Mengisi Hari Ini
+                </h3>
+                <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">
+                  Anda terdeteksi sudah pernah mengisi presensi kehadiran hari ini. Apakah Anda yakin ingin <strong>mengisi presensi lagi</strong>?
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 mt-6 pt-4 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={() => setShowDuplicateConfirm(false)}
+                className="flex-1 py-2.5 text-xs font-bold rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 transition"
+              >
+                Tidak
+              </button>
+              <button
+                type="button"
+                disabled={loading}
+                onClick={executeSubmit}
+                className="flex-1 py-2.5 text-xs font-bold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-200 flex items-center justify-center gap-1.5 transition disabled:opacity-50"
+              >
+                {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
+                <span>Ya, Kirim Lagi</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Konfirmasi Hapus Riwayat Presensi */}
+      {deletingItemId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-6 border border-rose-100 animate-in zoom-in-95 duration-150">
+            <div className="flex items-start gap-3.5">
+              <div className="w-11 h-11 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+                <Trash2 className="w-5 h-5" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-base font-extrabold text-slate-900">Hapus Data Presensi?</h3>
+                <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                  Data presensi yang dihapus akan hilang permanen dan tidak dapat dikembalikan.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center justify-end gap-2.5 mt-6 pt-4 border-t border-slate-100">
+              <button
+                type="button"
+                disabled={deleteLoading}
+                onClick={() => setDeletingItemId(null)}
+                className="flex-1 py-2.5 text-xs font-bold rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 transition"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                disabled={deleteLoading}
+                onClick={() => handleDeleteAttendance(deletingItemId)}
+                className="flex-1 py-2.5 text-xs font-bold rounded-xl bg-rose-600 hover:bg-rose-700 text-white shadow-md flex items-center justify-center gap-1.5 transition disabled:opacity-50"
+              >
+                {deleteLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                <span>Hapus</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

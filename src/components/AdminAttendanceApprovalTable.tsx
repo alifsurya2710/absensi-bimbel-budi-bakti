@@ -14,6 +14,7 @@ import {
   ChevronLeft,
   ChevronRight,
   UserPlus,
+  Trash2,
 } from "lucide-react";
 import AdminInputAttendanceModal from "@/components/AdminInputAttendanceModal";
 
@@ -61,6 +62,9 @@ export default function AdminAttendanceApprovalTable({ initialAttendances, users
   const [rejectingItem, setRejectingItem] = useState<AttendanceRecord | null>(null);
   const [rejectionReason, setRejectionReason] = useState("");
   const [quickReason, setQuickReason] = useState("Foto selfie buram / wajah tidak jelas");
+
+  // Modal Konfirmasi Hapus Presensi
+  const [deletingItem, setDeletingItem] = useState<AttendanceRecord | null>(null);
 
   const quickReasonOptions = [
     "Foto selfie buram / wajah tidak jelas",
@@ -128,6 +132,30 @@ export default function AdminAttendanceApprovalTable({ initialAttendances, users
           item.id === id ? { ...item, approvalStatus: "APPROVED", rejectionReason: null } : item
         )
       );
+    } catch (err: unknown) {
+      const errText = err instanceof Error ? err.message : "Terjadi kesalahan";
+      alert(errText);
+    } finally {
+      setLoadingId(null);
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deletingItem) return;
+    const targetId = deletingItem.id;
+    setLoadingId(targetId);
+
+    try {
+      const res = await fetch(`/api/attendance/${targetId}`, {
+        method: "DELETE",
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Gagal menghapus data presensi.");
+
+      // Hapus data dari state tabel secara instan (realtime)
+      setAttendances((prev) => prev.filter((item) => item.id !== targetId));
+      setDeletingItem(null);
     } catch (err: unknown) {
       const errText = err instanceof Error ? err.message : "Terjadi kesalahan";
       alert(errText);
@@ -359,6 +387,15 @@ export default function AdminAttendanceApprovalTable({ initialAttendances, users
                       >
                         {att.approvalStatus === "REJECTED" ? "Edit Tolak" : "Reject"}
                       </button>
+                      <button
+                        type="button"
+                        disabled={loadingId === att.id}
+                        onClick={() => setDeletingItem(att)}
+                        className="p-1.5 rounded-xl border border-slate-200 hover:border-rose-300 hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition disabled:opacity-40"
+                        title="Hapus Data Presensi"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -559,6 +596,60 @@ export default function AdminAttendanceApprovalTable({ initialAttendances, users
           setAttendances((prev) => [newAttendance, ...prev]);
         }}
       />
+
+      {/* Modal Konfirmasi Hapus Presensi */}
+      {deletingItem && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 sm:p-7 border border-rose-100 relative overflow-hidden">
+            <div className="flex items-start gap-4">
+              <div className="w-11 h-11 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+                <Trash2 className="w-5 h-5" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-base font-extrabold text-slate-900 leading-tight">
+                  Hapus Data Presensi?
+                </h3>
+                <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                  Apakah Anda yakin ingin menghapus data presensi milik{" "}
+                  <strong className="text-slate-800">{deletingItem.user.name}</strong> ({deletingItem.user.role}) pada tanggal{" "}
+                  {new Date(deletingItem.createdAt).toLocaleDateString("id-ID", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })}?
+                </p>
+                <div className="mt-3 p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-[11px] text-rose-800 leading-snug">
+                  Data yang dihapus akan hilang permanen dari database dan tidak dapat dipulihkan.
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 mt-6 pt-4 border-t border-slate-100">
+              <button
+                type="button"
+                disabled={loadingId === deletingItem.id}
+                onClick={() => setDeletingItem(null)}
+                className="px-4 py-2 text-xs font-semibold rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 transition"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                disabled={loadingId === deletingItem.id}
+                onClick={handleConfirmDelete}
+                className="px-5 py-2 text-xs font-bold rounded-xl bg-rose-600 hover:bg-rose-700 text-white shadow-md shadow-rose-200 flex items-center gap-1.5 transition disabled:opacity-50"
+              >
+                {loadingId === deletingItem.id ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <Trash2 className="w-3.5 h-3.5" />
+                )}
+                <span>Hapus Permanen</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

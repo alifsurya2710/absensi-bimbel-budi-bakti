@@ -21,19 +21,64 @@ export default async function SuperAdminDashboard() {
     redirect("/attendance");
   }
 
-  // Optimasi: Agregasi per-role dalam 1 query Prisma groupBy & 1 attendance count
-  // untuk mencegah koneksi database pool habis (exhausted pool timeout)
-  const [roleCounts, totalAttendances, managedUsers, recentAttendances, parentAttendances, dbUser] =
-    await Promise.all([
-      prisma.user.groupBy({
-        by: ["role"],
-        _count: { _all: true },
-      }),
-      prisma.attendance.count(),
-      prisma.user.findMany({
-        where: {
-          role: { in: ["ADMIN", "GURU", "MURID"] },
+  // Ambil data dashboard secara berurutan dengan reuse koneksi
+  // untuk mencegah koneksi Neon pooler habis (exhausted pool timeout)
+  const roleCounts = await prisma.user.groupBy({
+    by: ["role"],
+    _count: { _all: true },
+  });
+
+  const totalAttendances = await prisma.attendance.count();
+
+  const managedUsers = await prisma.user.findMany({
+    where: {
+      role: { in: ["ADMIN", "GURU", "MURID"] },
+    },
+    select: {
+      id: true,
+      name: true,
+      username: true,
+      email: true,
+      phone: true,
+      role: true,
+      kelas: true,
+      image: true,
+      createdAt: true,
+      _count: {
+        select: {
+          attendances: true,
         },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  const recentAttendances = await prisma.attendance.findMany({
+    include: { user: true },
+    orderBy: { createdAt: "desc" },
+    take: 20,
+  });
+
+  const parentAttendances = await prisma.parentAttendance.findMany({
+    include: {
+      student: {
+        select: {
+          id: true,
+          name: true,
+          username: true,
+          kelas: true,
+          image: true,
+          phone: true,
+        },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+    take: 30,
+  });
+
+  const dbUser = session?.user?.id
+    ? await prisma.user.findUnique({
+        where: { id: session.user.id },
         select: {
           id: true,
           name: true,
@@ -43,52 +88,9 @@ export default async function SuperAdminDashboard() {
           role: true,
           kelas: true,
           image: true,
-          createdAt: true,
-          _count: {
-            select: {
-              attendances: true,
-            },
-          },
         },
-        orderBy: { createdAt: "desc" },
-      }),
-      prisma.attendance.findMany({
-        include: { user: true },
-        orderBy: { createdAt: "desc" },
-        take: 20,
-      }),
-      prisma.parentAttendance.findMany({
-        include: {
-          student: {
-            select: {
-              id: true,
-              name: true,
-              username: true,
-              kelas: true,
-              image: true,
-              phone: true,
-            },
-          },
-        },
-        orderBy: { createdAt: "desc" },
-        take: 30,
-      }),
-      session?.user?.id
-        ? prisma.user.findUnique({
-            where: { id: session.user.id },
-            select: {
-              id: true,
-              name: true,
-              username: true,
-              email: true,
-              phone: true,
-              role: true,
-              kelas: true,
-              image: true,
-            },
-          })
-        : Promise.resolve(null),
-    ]);
+      })
+    : null;
 
   const countMap: Record<string, number> = {};
   let totalUsers = 0;

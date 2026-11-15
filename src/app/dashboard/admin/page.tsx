@@ -20,71 +20,75 @@ export default async function AdminDashboard() {
     }
     redirect("/attendance");
   }
-  const [roleCounts, attendancesList, managedUsers, parentAttendances, dbUser] = await Promise.all([
-    prisma.user.groupBy({
-      by: ["role"],
-      where: { role: { in: ["GURU", "MURID"] } },
-      _count: { _all: true },
-    }),
-    prisma.attendance.findMany({
-      include: { user: true },
-      orderBy: { createdAt: "desc" },
-      take: 20,
-    }),
-    prisma.user.findMany({
-      where: {
-        role: { in: ["GURU", "MURID"] },
-      },
-      select: {
-        id: true,
-        name: true,
-        username: true,
-        email: true,
-        phone: true,
-        role: true,
-        kelas: true,
-        image: true,
-        createdAt: true,
-        _count: {
-          select: {
-            attendances: true,
-          },
+  // Ambil data dashboard admin secara berurutan dengan reuse koneksi
+  // untuk mencegah koneksi Neon pooler habis (exhausted pool timeout)
+  const roleCounts = await prisma.user.groupBy({
+    by: ["role"],
+    where: { role: { in: ["GURU", "MURID"] } },
+    _count: { _all: true },
+  });
+
+  const attendancesList = await prisma.attendance.findMany({
+    include: { user: true },
+    orderBy: { createdAt: "desc" },
+    take: 20,
+  });
+
+  const managedUsers = await prisma.user.findMany({
+    where: {
+      role: { in: ["GURU", "MURID"] },
+    },
+    select: {
+      id: true,
+      name: true,
+      username: true,
+      email: true,
+      phone: true,
+      role: true,
+      kelas: true,
+      image: true,
+      createdAt: true,
+      _count: {
+        select: {
+          attendances: true,
         },
       },
-      orderBy: { createdAt: "desc" },
-    }),
-    prisma.parentAttendance.findMany({
-      include: {
-        student: {
-          select: {
-            id: true,
-            name: true,
-            username: true,
-            kelas: true,
-            image: true,
-            phone: true,
-          },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  const parentAttendances = await prisma.parentAttendance.findMany({
+    include: {
+      student: {
+        select: {
+          id: true,
+          name: true,
+          username: true,
+          kelas: true,
+          image: true,
+          phone: true,
         },
       },
-      orderBy: { createdAt: "desc" },
-      take: 30,
-    }),
-    session?.user?.id
-      ? prisma.user.findUnique({
-          where: { id: session.user.id },
-          select: {
-            id: true,
-            name: true,
-            username: true,
-            email: true,
-            phone: true,
-            role: true,
-            kelas: true,
-            image: true,
-          },
-        })
-      : Promise.resolve(null),
-  ]);
+    },
+    orderBy: { createdAt: "desc" },
+    take: 30,
+  });
+
+  const dbUser = session?.user?.id
+    ? await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: {
+          id: true,
+          name: true,
+          username: true,
+          email: true,
+          phone: true,
+          role: true,
+          kelas: true,
+          image: true,
+        },
+      })
+    : null;
 
   const countMap: Record<string, number> = {};
   for (const item of roleCounts) {

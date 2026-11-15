@@ -42,6 +42,7 @@ export default function ParentAttendanceForm({
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [history, setHistory] = useState<ParentAttendanceRecord[]>(initialHistory);
+  const [showDuplicateConfirm, setShowDuplicateConfirm] = useState(false);
 
   const statusOptions = [
     {
@@ -86,21 +87,8 @@ export default function ParentAttendanceForm({
     },
   ];
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setSuccess(null);
-
-    if (!parentName.trim()) {
-      setError("Mohon isi Nama Lengkap Orang Tua / Wali.");
-      return;
-    }
-
-    if (!parentPhone.trim()) {
-      setError("Mohon isi Nomor Telepon Orang Tua / Wali.");
-      return;
-    }
-
+  const executeSubmit = async () => {
+    setShowDuplicateConfirm(false);
     try {
       setLoading(true);
       const res = await fetch("/api/parent-attendance", {
@@ -147,6 +135,35 @@ export default function ParentAttendanceForm({
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setSuccess(null);
+
+    if (!parentName.trim()) {
+      setError("Mohon isi Nama Lengkap Orang Tua / Wali.");
+      return;
+    }
+
+    if (!parentPhone.trim()) {
+      setError("Mohon isi Nomor Telepon Orang Tua / Wali.");
+      return;
+    }
+
+    // Periksa apakah orang tua/wali sudah pernah mengisi presensi pada hari ini
+    const todayStr = new Date().toDateString();
+    const alreadyAttendedToday = history.some(
+      (item) => new Date(item.createdAt).toDateString() === todayStr
+    );
+
+    if (alreadyAttendedToday) {
+      setShowDuplicateConfirm(true);
+      return;
+    }
+
+    await executeSubmit();
   };
 
   return (
@@ -348,6 +365,46 @@ export default function ParentAttendanceForm({
                 </span>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Pop-up Peringatan Jika Mengisi Absensi Orang Tua 2 Kali */}
+      {showDuplicateConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-6 border border-amber-200 relative overflow-hidden animate-in zoom-in-95 duration-150">
+            <div className="flex items-start gap-3.5">
+              <div className="w-11 h-11 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
+                <AlertCircle className="w-6 h-6" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-base font-extrabold text-slate-900 leading-snug">
+                  Sudah Mengisi Hari Ini
+                </h3>
+                <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">
+                  Absensi kunjungan orang tua / wali terdeteksi sudah pernah diisi pada hari ini. Apakah Anda yakin ingin <strong>mengisi 2 kali</strong>?
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 mt-6 pt-4 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={() => setShowDuplicateConfirm(false)}
+                className="flex-1 py-2.5 text-xs font-bold rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 transition"
+              >
+                Tidak
+              </button>
+              <button
+                type="button"
+                disabled={loading}
+                onClick={executeSubmit}
+                className="flex-1 py-2.5 text-xs font-bold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-200 flex items-center justify-center gap-1.5 transition disabled:opacity-50"
+              >
+                {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
+                <span>Ya, Kirim Lagi</span>
+              </button>
+            </div>
           </div>
         </div>
       )}
