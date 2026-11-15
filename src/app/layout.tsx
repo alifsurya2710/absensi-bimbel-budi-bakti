@@ -4,8 +4,8 @@ import { SessionProvider } from 'next-auth/react';
 import MobileSplashScreen from '@/components/MobileSplashScreen';
 
 export const metadata: Metadata = {
-  title: 'FORSIREMIS - Presensi & Akademik',
-  description: 'Sistem Informasi Presensi & Akademik FORSIREMIS - Bimbingan Latihan Persiapan Menuju PTN',
+  title: 'FORSIREMIS - Absensi',
+  description: 'Sistem Informasi Absensi FORSIREMIS - Bimbingan Latihan Persiapan Menuju PTN',
   manifest: '/manifest.json',
   icons: {
     icon: '/logo-forsiremis.png',

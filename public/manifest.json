@@ -1,7 +1,7 @@
 {
-  "name": "FORSIREMIS",
+  "name": "FORSIREMIS - Absensi",
   "short_name": "FORSIREMIS",
-  "description": "Sistem Presensi FORSIREMIS - Bimbingan Latihan Persiapan Menuju PTN",
+  "description": "Sistem Informasi Absensi FORSIREMIS - Bimbingan Latihan Persiapan Menuju PTN",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0f172a",
