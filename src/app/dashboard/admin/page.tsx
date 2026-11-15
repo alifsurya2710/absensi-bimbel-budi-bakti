@@ -2,12 +2,24 @@ import DashboardShell from "@/components/DashboardShell";
 import AdminDashboardClient from "@/components/AdminDashboardClient";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
 import { Users, GraduationCap, UserCheck, CalendarDays } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboard() {
   const session = await auth();
+
+  if (!session?.user?.id) {
+    redirect("/login");
+  }
+
+  if (session.user.role !== "ADMIN") {
+    if (session.user.role === "SUPERADMIN") {
+      redirect("/dashboard/superadmin");
+    }
+    redirect("/attendance");
+  }
   const [roleCounts, attendancesList, managedUsers, parentAttendances, dbUser] = await Promise.all([
     prisma.user.groupBy({
       by: ["role"],

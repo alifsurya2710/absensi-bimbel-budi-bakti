@@ -1,64 +1,33 @@
-import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-export default auth((req) => {
+export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
-  const session = req.auth;
-  const role = session?.user?.role;
+  
+  // Baca session token dari cookie (NextAuth v5 menggunakan nama cookie ini)
+  const token =
+    req.cookies.get("__Secure-authjs.session-token")?.value ||
+    req.cookies.get("authjs.session-token")?.value ||
+    req.cookies.get("__Secure-next-auth.session-token")?.value ||
+    req.cookies.get("next-auth.session-token")?.value;
 
-  // 1. Proteksi Halaman Dashboard (HANYA SUPERADMIN & ADMIN)
-  if (pathname.startsWith("/dashboard")) {
-    if (!session || !role) {
-      return NextResponse.redirect(new URL("/login", req.url));
-    }
+  const isAuthPage = pathname === "/login" || pathname === "/register";
+  const isProtectedPage = pathname.startsWith("/dashboard") || pathname.startsWith("/attendance");
 
-    // Jika Murid atau Guru mencoba membuka dashboard, lempar ke /attendance
-    if (role === "MURID" || role === "GURU") {
-      return NextResponse.redirect(new URL("/attendance", req.url));
-    }
-
-    // Hanya Superadmin yang boleh buka dashboard superadmin
-    if (pathname.startsWith("/dashboard/superadmin") && role !== "SUPERADMIN") {
-      return NextResponse.redirect(new URL("/dashboard/admin", req.url));
-    }
-
-    // Hanya Admin yang boleh buka dashboard admin
-    if (pathname.startsWith("/dashboard/admin") && role !== "ADMIN") {
-      if (role === "SUPERADMIN") {
-        return NextResponse.redirect(new URL("/dashboard/superadmin", req.url));
-      }
-      return NextResponse.redirect(new URL("/attendance", req.url));
-    }
+  // Jika belum login dan mengakses halaman yang dilindungi, redirect ke /login
+  if (!token && isProtectedPage) {
+    const loginUrl = new URL("/login", req.url);
+    loginUrl.searchParams.set("callbackUrl", pathname);
+    return NextResponse.redirect(loginUrl);
   }
 
-  // 2. Proteksi Halaman Presensi /attendance (Khusus Murid & Guru)
-  if (pathname.startsWith("/attendance")) {
-    if (!session || !role) {
-      return NextResponse.redirect(new URL("/login", req.url));
-    }
-
-    // Jika Superadmin / Admin membuka attendance, arahkan ke dashboard mereka
-    if (role === "SUPERADMIN") {
-      return NextResponse.redirect(new URL("/dashboard/superadmin", req.url));
-    }
-    if (role === "ADMIN") {
-      return NextResponse.redirect(new URL("/dashboard/admin", req.url));
-    }
-  }
-
-  // 3. Jika sudah login dan membuka /login atau /register
-  if ((pathname === "/login" || pathname === "/register") && session && role) {
-    if (role === "SUPERADMIN") {
-      return NextResponse.redirect(new URL("/dashboard/superadmin", req.url));
-    }
-    if (role === "ADMIN") {
-      return NextResponse.redirect(new URL("/dashboard/admin", req.url));
-    }
-    return NextResponse.redirect(new URL("/attendance", req.url));
+  // Jika sudah login dan membuka halaman /login atau /register, redirect ke /dashboard
+  if (token && isAuthPage) {
+    return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
   return NextResponse.next();
-});
+}
 
 export const config = {
   matcher: ["/dashboard/:path*", "/attendance/:path*", "/login", "/register"],

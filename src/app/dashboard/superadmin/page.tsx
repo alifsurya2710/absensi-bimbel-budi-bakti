@@ -2,12 +2,24 @@ import DashboardShell from "@/components/DashboardShell";
 import AdminDashboardClient from "@/components/AdminDashboardClient";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
 import { ShieldAlert, Users, Activity, KeyRound, Database } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
 export default async function SuperAdminDashboard() {
   const session = await auth();
+
+  if (!session?.user?.id) {
+    redirect("/login");
+  }
+
+  if (session.user.role !== "SUPERADMIN") {
+    if (session.user.role === "ADMIN") {
+      redirect("/dashboard/admin");
+    }
+    redirect("/attendance");
+  }
 
   // Optimasi: Agregasi per-role dalam 1 query Prisma groupBy & 1 attendance count
   // untuk mencegah koneksi database pool habis (exhausted pool timeout)

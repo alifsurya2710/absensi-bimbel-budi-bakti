@@ -103,7 +103,7 @@ export default function InstallPromptBanner() {
           </div>
           <div>
             <h3 className="text-sm font-bold text-slate-900 leading-snug">
-              Pasang FORSIREMIS di HP Anda seperti aplikasi biasa?
+              Pasang FORSIREMIS Absensi di HP Anda seperti aplikasi biasa?
             </h3>
             <p className="text-xs text-slate-500 mt-1 leading-relaxed">
               Buka lebih cepat dari layar utama, tanpa repot buka browser.
