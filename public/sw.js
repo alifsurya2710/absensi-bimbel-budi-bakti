@@ -13,11 +13,11 @@ self.addEventListener("push", (event) => {
 
   try {
     const data = event.data.json();
-    const title = data.title || "🔔 Notifikasi Bimbel BUDI BAKTI";
+    const title = data.title || "🔔 Notifikasi FORSIREMIS";
     const options = {
       body: data.body || "Aktivitas presensi baru diterima.",
-      icon: data.icon || "/logo.jpg",
-      badge: data.badge || "/logo.jpg",
+      icon: data.icon || "/logo-forsiremis.png",
+      badge: data.badge || "/logo-forsiremis.png",
       vibrate: [200, 100, 200],
       tag: data.data?.notificationId || "presensi-update",
       renotify: true,

@@ -125,6 +125,9 @@ export default function DashboardShell({
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Lonceng Notifikasi Mobile */}
+          <AttendanceNotificationBell currentUserRole={activeRole} hidePermissionBanner={false} />
+
           {/* Theme Toggle Button Mobile */}
           <button
             type="button"

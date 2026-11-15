@@ -105,7 +105,8 @@ export default function NotificationManager({
 
     const timer = setTimeout(() => {
       if ("Notification" in window) {
-        if (Notification.permission === "default") {
+        const isDismissed = sessionStorage.getItem("notif_permission_dismissed") === "true";
+        if (Notification.permission === "default" && !isDismissed) {
           // Tampilkan banner izin di tengah layar
           setIsPermissionBannerVisible(true);
         } else if (Notification.permission === "granted") {
@@ -162,19 +163,29 @@ export default function NotificationManager({
           // Cek apakah ada notifikasi baru untuk memicu Pop-Up Toast
           if (data.notifications.length > 0) {
             const newest = data.notifications[0];
-            if (lastSeenIdRef.current && lastSeenIdRef.current !== newest.id) {
-              // Ada notifikasi baru yang masuk!
+            if (!lastSeenIdRef.current) {
+              // Pertama kali fetch saat halaman dibuka:
+              // Tampilkan toast jika ada notifikasi belum dibaca yang baru (< 10 menit lalu)
+              const now = new Date().getTime();
+              const freshUnread = data.notifications.filter((n: RealtimeNotification) => {
+                if (n.isRead) return false;
+                const createdTime = new Date(n.createdAt).getTime();
+                return now - createdTime < 10 * 60 * 1000;
+              });
+
+              if (freshUnread.length > 0) {
+                setToasts(freshUnread.slice(0, 3));
+              }
+            } else if (lastSeenIdRef.current !== newest.id) {
+              // Ada notifikasi baru yang masuk saat admin sedang membuka halaman!
               const newItems = data.notifications.filter(
                 (n: RealtimeNotification) => n.id !== lastSeenIdRef.current && !n.isRead
               );
 
               if (newItems.length > 0) {
-                // Mainkan suara chime lembut / vibrasi jika tersedia
                 if ("vibrate" in navigator) {
                   navigator.vibrate([100, 50, 100]);
                 }
-
-                // Tambahkan ke pop-up toast
                 setToasts((prev) => [...newItems, ...prev].slice(0, 4));
               }
             }
