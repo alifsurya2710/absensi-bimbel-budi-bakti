@@ -71,6 +71,48 @@ export async function GET(req: Request) {
   }
 }
 
+// DELETE /api/notifications - Hapus satu atau semua notifikasi untuk pengguna yang sedang login
+export async function DELETE(req: Request) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (session.user.role !== "SUPERADMIN" && session.user.role !== "ADMIN") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const { searchParams } = new URL(req.url);
+    const deleteAll = searchParams.get("all") === "true";
+    const notificationId = searchParams.get("id");
+
+    if (deleteAll) {
+      await prisma.notificationRecipient.deleteMany({
+        where: {
+          userId: session.user.id,
+        },
+      });
+      return NextResponse.json({ message: "Semua notifikasi berhasil dibersihkan." });
+    }
+
+    if (notificationId) {
+      await prisma.notificationRecipient.deleteMany({
+        where: {
+          notificationId,
+          userId: session.user.id,
+        },
+      });
+      return NextResponse.json({ message: "Notifikasi berhasil dihapus." });
+    }
+
+    return NextResponse.json({ error: "Parameter id atau all dibutuhkan" }, { status: 400 });
+  } catch (error) {
+    console.error("DELETE /api/notifications error:", error);
+    return NextResponse.json({ error: "Gagal menghapus notifikasi" }, { status: 500 });
+  }
+}
+
 // PATCH /api/notifications - Tandai notifikasi sebagai sudah dibaca (tunggal atau semua)
 export async function PATCH(req: Request) {
   try {

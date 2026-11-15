@@ -12,6 +12,8 @@ import {
   GraduationCap,
   Clock,
   Sparkles,
+  Trash2,
+  Loader2,
 } from "lucide-react";
 
 export interface RealtimeNotification {
@@ -50,6 +52,8 @@ export default function NotificationManager({
   const [isPermissionBannerVisible, setIsPermissionBannerVisible] = useState(false);
   const [isSubscribing, setIsSubscribing] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [isDeletingAll, setIsDeletingAll] = useState(false);
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   const lastSeenIdRef = useRef<string | null>(null);
 
@@ -238,6 +242,41 @@ export default function NotificationManager({
     }
   };
 
+  // Hapus semua notifikasi milik user
+  const clearAllNotifications = async () => {
+    try {
+      setIsDeletingAll(true);
+      const res = await fetch("/api/notifications?all=true", {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        setNotificationsList([]);
+        setUnreadCount(0);
+        setToasts([]);
+        setShowClearConfirm(false);
+      }
+    } catch (e) {
+      console.error("Gagal menghapus notifikasi:", e);
+    } finally {
+      setIsDeletingAll(false);
+    }
+  };
+
+  // Hapus satu item notifikasi
+  const deleteSingleNotification = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      await fetch(`/api/notifications?id=${id}`, {
+        method: "DELETE",
+      });
+      setNotificationsList((prev) => prev.filter((n) => n.id !== id));
+      setUnreadCount((c) => Math.max(0, c - 1));
+      dismissToast(id);
+    } catch (err) {
+      console.error("Gagal menghapus notifikasi item:", err);
+    }
+  };
+
   const handleOpenDetail = (notif: RealtimeNotification) => {
     markAsRead(notif.id);
     dismissToast(notif.id);
@@ -411,6 +450,53 @@ export default function NotificationManager({
       {mounted && permissionModalContent && createPortal(permissionModalContent, document.body)}
       {mounted && toastContent && createPortal(toastContent, document.body)}
 
+      {/* Modal Konfirmasi Hapus Semua Notifikasi */}
+      {showClearConfirm &&
+        mounted &&
+        createPortal(
+          <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/70 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+            <div className="bg-white rounded-3xl p-6 shadow-2xl border border-rose-100 max-w-sm w-full space-y-4 animate-in zoom-in-95 duration-150">
+              <div className="flex items-start gap-3.5">
+                <div className="w-11 h-11 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+                  <Trash2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-base font-extrabold text-slate-900 leading-snug">
+                    Hapus Semua Notifikasi?
+                  </h4>
+                  <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                    Semua riwayat notifikasi di pusat notifikasi Anda akan dibersihkan dan tidak dapat dikembalikan.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2.5 pt-2">
+                <button
+                  type="button"
+                  disabled={isDeletingAll}
+                  onClick={() => setShowClearConfirm(false)}
+                  className="flex-1 py-2.5 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition"
+                >
+                  Batal
+                </button>
+                <button
+                  type="button"
+                  disabled={isDeletingAll}
+                  onClick={clearAllNotifications}
+                  className="flex-1 py-2.5 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-xl transition shadow-md shadow-rose-200 flex items-center justify-center gap-1.5 disabled:opacity-50"
+                >
+                  {isDeletingAll ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <Trash2 className="w-3.5 h-3.5" />
+                  )}
+                  <span>Hapus Semua</span>
+                </button>
+              </div>
+            </div>
+          </div>,
+          document.body
+        )}
+
       {/* 3. TOMBOL LONCENG NOTIFICATION CENTER (FLOATING ATAU EMBEDDED DI NAV) */}
       <div className="relative">
         <button
@@ -466,6 +552,17 @@ export default function NotificationManager({
                         className="text-[10px] font-bold text-sky-600 hover:text-sky-800 transition px-2 py-1 rounded-md hover:bg-sky-50"
                       >
                         Tandai Dibaca
+                      </button>
+                    )}
+                    {notificationsList.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => setShowClearConfirm(true)}
+                        className="text-[10px] font-bold text-rose-600 hover:text-rose-800 transition px-2 py-1 rounded-md hover:bg-rose-50 flex items-center gap-1"
+                        title="Hapus semua notifikasi"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                        <span>Hapus Semua</span>
                       </button>
                     )}
                     <button
@@ -551,6 +648,15 @@ export default function NotificationManager({
                         {!n.isRead && (
                           <span className="w-2 h-2 rounded-full bg-sky-500 shrink-0 self-center"></span>
                         )}
+
+                        <button
+                          type="button"
+                          onClick={(e) => deleteSingleNotification(n.id, e)}
+                          className="opacity-60 hover:opacity-100 p-1 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition shrink-0 self-center"
+                          title="Hapus notifikasi ini"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
                       </div>
                     ))
                   )}
