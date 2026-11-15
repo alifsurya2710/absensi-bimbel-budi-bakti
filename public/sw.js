@@ -1,4 +1,4 @@
-// Service Worker untuk Push Notification Bimbel BUDI BAKTI
+// Service Worker untuk Push Notification FORSIREMIS
 self.addEventListener("install", () => {
   self.skipWaiting();
 });
@@ -18,17 +18,20 @@ self.addEventListener("push", (event) => {
       body: data.body || "Aktivitas presensi baru diterima.",
       icon: data.icon || "/logo-forsiremis.png",
       badge: data.badge || "/logo-forsiremis.png",
-      vibrate: [200, 100, 200],
-      tag: data.data?.notificationId || "presensi-update",
+      vibrate: [300, 150, 300],
+      tag: data.data?.approvalStatus
+        ? `approval-${Date.now()}`
+        : data.data?.notificationId || "presensi-update",
       renotify: true,
+      requireInteraction: true,
       data: {
-        url: data.url || "/dashboard",
+        url: data.url || "/attendance",
         ...data.data,
       },
       actions: [
         {
           action: "open",
-          title: "Lihat Detail",
+          title: "Buka Aplikasi",
         },
         {
           action: "close",

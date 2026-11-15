@@ -23,6 +23,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Users2,
+  Bell,
+  Sparkles,
 } from "lucide-react";
 import EditProfileModal from "@/components/EditProfileModal";
 import Interactive3DBackground from "@/components/Interactive3DBackground";
@@ -87,6 +89,8 @@ export default function AttendanceClient({
   const [showDuplicateConfirm, setShowDuplicateConfirm] = useState(false);
   const [deletingItemId, setDeletingItemId] = useState<string | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [isPushBannerVisible, setIsPushBannerVisible] = useState(false);
+  const [isSubscribingPush, setIsSubscribingPush] = useState(false);
   const [activePopup, setActivePopup] = useState<AttendanceRecord | null>(() => {
     if (initialHistory && initialHistory.length > 0) {
       const latest = initialHistory[0];
@@ -127,6 +131,82 @@ export default function AttendanceClient({
     const interval = setInterval(checkLatestStatus, 6000);
     return () => clearInterval(interval);
   }, [dismissedPopupIds]);
+
+  // Registrasi Push Notification Service Worker untuk Murid & Guru
+  const registerStudentPush = async () => {
+    if (typeof window === "undefined" || !("serviceWorker" in navigator) || !("PushManager" in window)) return;
+    try {
+      setIsSubscribingPush(true);
+      const reg = await navigator.serviceWorker.register("/sw.js");
+      await navigator.serviceWorker.ready;
+
+      let sub = await reg.pushManager.getSubscription();
+      const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+
+      if (!sub && vapidPublicKey) {
+        const padding = "=".repeat((4 - (vapidPublicKey.length % 4)) % 4);
+        const base64 = (vapidPublicKey + padding).replace(/-/g, "+").replace(/_/g, "/");
+        const rawData = window.atob(base64);
+        const convertedKey = new Uint8Array(rawData.length);
+        for (let i = 0; i < rawData.length; ++i) {
+          convertedKey[i] = rawData.charCodeAt(i);
+        }
+
+        sub = await reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: convertedKey,
+        });
+      }
+
+      if (sub) {
+        await fetch("/api/push-subscription", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            subscription: sub.toJSON(),
+            userAgent: navigator.userAgent,
+          }),
+        });
+      }
+    } catch (e) {
+      console.warn("Gagal register push murid/guru:", e);
+    } finally {
+      setIsSubscribingPush(false);
+    }
+  };
+
+  // Cek izin notifikasi murid / guru otomatis
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const timer = setTimeout(() => {
+      if ("Notification" in window) {
+        const isDismissed = sessionStorage.getItem("student_notif_dismissed") === "true";
+        if (Notification.permission === "default" && !isDismissed) {
+          setIsPushBannerVisible(true);
+        } else if (Notification.permission === "granted") {
+          registerStudentPush();
+        }
+      }
+    }, 600);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleRequestPushPermission = async () => {
+    if (!("Notification" in window)) {
+      alert("Browser Anda tidak mendukung push notification.");
+      return;
+    }
+    try {
+      const permission = await Notification.requestPermission();
+      setIsPushBannerVisible(false);
+      if (permission === "granted") {
+        await registerStudentPush();
+      }
+    } catch (err) {
+      console.error(err);
+      setIsPushBannerVisible(false);
+    }
+  };
 
   // Kamera Langsung (Webcam)
   const [isCameraActive, setIsCameraActive] = useState(false);
@@ -1229,6 +1309,52 @@ export default function AttendanceClient({
               >
                 {deleteLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
                 <span>Hapus</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Modal Permintaan Izin Push Notification Murid & Guru */}
+      {isPushBannerVisible && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/70 backdrop-blur-xs p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl p-6 shadow-2xl border border-emerald-100 max-w-sm w-full mx-auto space-y-4 animate-in zoom-in-95 duration-200">
+            <div className="flex items-start gap-3.5">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-600 flex items-center justify-center text-white shadow-md shadow-emerald-200 shrink-0">
+                <Bell className="w-6 h-6 animate-bounce" />
+              </div>
+              <div className="space-y-1">
+                <h4 className="text-sm font-black text-slate-900 leading-snug">
+                  Aktifkan Notifikasi di HP Anda?
+                </h4>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  Dapatkan pemberitahuan langsung saat pengajuan presensi Anda telah <strong>Disetujui</strong> atau <strong>Ditolak</strong> oleh Guru / Admin, bahkan saat HP terkunci.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2.5 pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsPushBannerVisible(false);
+                  sessionStorage.setItem("student_notif_dismissed", "true");
+                }}
+                className="flex-1 py-2.5 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition"
+              >
+                Nanti
+              </button>
+              <button
+                type="button"
+                disabled={isSubscribingPush}
+                onClick={handleRequestPushPermission}
+                className="flex-1 py-2.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition shadow-md shadow-emerald-200 flex items-center justify-center gap-1.5"
+              >
+                {isSubscribingPush ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <Sparkles className="w-3.5 h-3.5" />
+                )}
+                <span>Aktifkan</span>
               </button>
             </div>
           </div>

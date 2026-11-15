@@ -135,4 +135,88 @@ export async function createAndDispatchNotification({
   }
 }
 
+/**
+ * Kirim Push Notification status Approval (Disetujui / Ditolak) langsung ke HP Murid atau Guru
+ */
+export async function sendApprovalPushNotification({
+  targetUserId,
+  approvalStatus,
+  rejectionReason,
+  statusLabel,
+  approverName,
+}: {
+  targetUserId: string;
+  approvalStatus: "APPROVED" | "REJECTED";
+  rejectionReason?: string | null;
+  statusLabel: string;
+  approverName?: string;
+}) {
+  try {
+    const targetUser = await prisma.user.findUnique({
+      where: { id: targetUserId },
+      include: {
+        pushSubscriptions: true,
+      },
+    });
+
+    if (!targetUser || targetUser.pushSubscriptions.length === 0) {
+      return null;
+    }
+
+    const isApproved = approvalStatus === "APPROVED";
+    const title = isApproved
+      ? "✅ PRESENSI ANDA DISETUJUI!"
+      : "❌ PRESENSI ANDA DITOLAK";
+
+    const body = isApproved
+      ? `Pengajuan presensi (${statusLabel}) Anda telah diverifikasi dan disetujui oleh ${approverName || "Admin"}.`
+      : `Pengajuan presensi (${statusLabel}) Anda ditolak oleh ${approverName || "Admin"}.\nAlasan: ${rejectionReason || "Tidak sesuai ketentuan."}`;
+
+    const payload: SendPushPayload = {
+      title,
+      body,
+      icon: "/logo-forsiremis.png",
+      badge: "/logo-forsiremis.png",
+      url: "/attendance",
+      data: {
+        approvalStatus,
+        rejectionReason: rejectionReason || null,
+        targetUserId,
+      },
+    };
+
+    const payloadString = JSON.stringify(payload);
+
+    const promises = targetUser.pushSubscriptions.map(async (sub) => {
+      try {
+        await webpush.sendNotification(
+          {
+            endpoint: sub.endpoint,
+            keys: {
+              p256dh: sub.p256dh,
+              auth: sub.auth,
+            },
+          },
+          payloadString
+        );
+      } catch (error: unknown) {
+        const err = error as { statusCode?: number };
+        if (err.statusCode === 404 || err.statusCode === 410) {
+          await prisma.pushSubscription.delete({ where: { id: sub.id } }).catch(() => {});
+        }
+      }
+    });
+
+    Promise.allSettled(promises).catch((err) =>
+      console.error("Error sending approval push:", err)
+    );
+
+    return true;
+  } catch (error) {
+    console.error("sendApprovalPushNotification error:", error);
+    return null;
+  }
+}
+
+
 

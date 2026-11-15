@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ApprovalStatus } from "@prisma/client";
+import { sendApprovalPushNotification } from "@/lib/pushNotification";
 
 // PATCH /api/attendance/[id]/approval - Approve / Reject Attendance
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -27,10 +28,21 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       },
       include: {
         user: {
-          select: { name: true, role: true },
+          select: { id: true, name: true, role: true },
         },
       },
     });
+
+    // Kirim Push Notification ke HP Murid atau Guru
+    if (attendance.userId && (approvalStatus === "APPROVED" || approvalStatus === "REJECTED")) {
+      sendApprovalPushNotification({
+        targetUserId: attendance.userId,
+        approvalStatus: approvalStatus as "APPROVED" | "REJECTED",
+        rejectionReason: attendance.rejectionReason,
+        statusLabel: attendance.status.replace("_", " "),
+        approverName: session.user.name || "Administrator",
+      }).catch((err) => console.error("Error dispatching approval push:", err));
+    }
 
     return NextResponse.json({
       message: `Presensi berhasil ${approvalStatus === "APPROVED" ? "disetujui" : "ditolak"}!`,
