@@ -35,7 +35,7 @@ export default function RegisterPage() {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [kelas, setKelas] = useState("XII RPL 1");
+  const [kelas, setKelas] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -330,11 +330,11 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            {/* Kelas (Khusus Siswa) */}
+            {/* Asal Sekolah (Khusus Siswa) */}
             {role === "MURID" && (
               <div>
                 <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
-                  Kelas
+                  Asal Sekolah
                 </label>
                 <div className="relative">
                   <BookOpen className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
@@ -344,7 +344,7 @@ export default function RegisterPage() {
                     value={kelas}
                     onChange={(e) => setKelas(e.target.value)}
                     className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 focus:outline-none transition"
-                    placeholder="XII RPL 1"
+                    placeholder="Contoh: SMA Negeri 1 Jakarta"
                   />
                 </div>
               </div>

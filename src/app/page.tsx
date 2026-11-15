@@ -72,7 +72,7 @@ export default async function HomePage() {
           </h1>
 
           <p className="mt-5 text-sm sm:text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
-            Sistem pencatatan kehadiran modern berbasis foto selfie kamera langsung, persetujuan realtime, monitoring kelas, dan rekapitulasi data Excel instan.
+            Sistem pencatatan kehadiran modern berbasis foto selfie kamera langsung, persetujuan realtime, monitoring presensi siswa &amp; guru, dan rekapitulasi data Excel instan.
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">

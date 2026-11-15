@@ -131,7 +131,7 @@ export default function ParentAttendanceTable({
                 setSearch(e.target.value);
                 setCurrentPage(1);
               }}
-              placeholder="Cari nama orang tua, nama murid, kelas, atau no. telepon..."
+              placeholder="Cari nama orang tua, nama murid, asal sekolah, atau no. telepon..."
               className="w-full pl-10 pr-4 py-2.5 text-xs text-slate-900 bg-slate-50/70 placeholder:text-slate-400 font-medium rounded-xl border border-slate-200 focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 focus:bg-white transition"
             />
           </div>
@@ -223,7 +223,7 @@ export default function ParentAttendanceTable({
                             {item.student?.name || "Murid Tidak Diketahui"}
                           </p>
                           <p className="text-[11px] text-sky-600 font-semibold">
-                            {item.student?.kelas ? `Kelas ${item.student.kelas}` : "Murid Bimbel"}
+                            {item.student?.kelas ? item.student.kelas : "Murid Bimbel"}
                           </p>
                         </div>
                       </div>

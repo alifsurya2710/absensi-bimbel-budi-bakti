@@ -311,11 +311,11 @@ export default function EditProfileModal({
               </div>
             </div>
 
-            {/* Kelas (Khusus Siswa/Murid) */}
+            {/* Asal Sekolah (Khusus Siswa/Murid) */}
             {user.role === "MURID" && (
               <div>
                 <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
-                  Kelas
+                  Asal Sekolah
                 </label>
                 <div className="relative">
                   <BookOpen className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
@@ -324,7 +324,7 @@ export default function EditProfileModal({
                     value={kelas}
                     onChange={(e) => setKelas(e.target.value)}
                     className="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-900 bg-white placeholder:text-slate-400 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 focus:outline-none transition"
-                    placeholder="XII RPL 1"
+                    placeholder="Contoh: SMA Negeri 1 Jakarta"
                   />
                 </div>
               </div>

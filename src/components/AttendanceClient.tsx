@@ -528,7 +528,7 @@ export default function AttendanceClient({
                 @{currentUser.username || "-"} • {currentUser.email || "Tanpa email"}
               </p>
               <p className="text-xs text-emerald-200 mt-0.5">
-                {currentUser.kelas ? `Kelas: ${currentUser.kelas} • ` : ""}No. HP: {currentUser.phone || "-"}
+                {currentUser.kelas ? `Asal Sekolah: ${currentUser.kelas} • ` : ""}No. HP: {currentUser.phone || "-"}
               </p>
             </div>
           </div>

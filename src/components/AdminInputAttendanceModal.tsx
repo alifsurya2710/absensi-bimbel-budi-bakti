@@ -172,7 +172,7 @@ export default function AdminInputAttendanceModal({
             </label>
             <input
               type="text"
-              placeholder="Cari nama, username, atau kelas..."
+              placeholder="Cari nama, username, atau asal sekolah..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full mb-2 p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-emerald-500"
