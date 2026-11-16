@@ -35,9 +35,9 @@ export async function sendOtpPasswordEmail(to: string, otpCode: string, userName
     to,
     subject: `${otpCode} adalah Kode Verifikasi OTP Reset Kata Sandi Anda`,
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 540px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 16px; background-color: #ffffff;">
+      <div style="font-family: Arial, sans-serif; max-width: 540px; margin: 0 auto; padding: 24px; border: 1px solid #d1fae5; border-radius: 16px; background-color: #ffffff;">
         <div style="text-align: center; margin-bottom: 24px;">
-          <h2 style="color: #4338ca; margin: 0;">FORSIREMIS</h2>
+          <h2 style="color: #059669; margin: 0; font-weight: 800; letter-spacing: 0.5px;">FORSIREMIS</h2>
           <p style="color: #64748b; font-size: 13px; margin-top: 4px;">Verifikasi Reset Kata Sandi Akun</p>
         </div>
 
@@ -47,7 +47,7 @@ export async function sendOtpPasswordEmail(to: string, otpCode: string, userName
         </p>
 
         <div style="text-align: center; margin: 28px 0;">
-          <span style="display: inline-block; font-size: 32px; font-weight: 800; letter-spacing: 10px; color: #4f46e5; background: #eef2ff; padding: 14px 28px; border-radius: 12px; border: 2px dashed #6366f1;">
+          <span style="display: inline-block; font-size: 32px; font-weight: 800; letter-spacing: 10px; color: #047857; background: #ecfdf5; padding: 14px 28px; border-radius: 12px; border: 2px dashed #10b981;">
             ${otpCode}
           </span>
         </div>
