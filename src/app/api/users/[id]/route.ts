@@ -52,8 +52,8 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     if (name) updateData.name = name.trim();
     if (role && (role === "GURU" || role === "MURID" || (role === "ADMIN" && isSuperadmin))) {
       updateData.role = role as Role;
-      if (role === "MURID") {
-        updateData.kelas = kelas || targetUser.kelas || "XII RPL 1";
+      if (role === "MURID" || role === "GURU") {
+        updateData.kelas = kelas || targetUser.kelas || null;
       } else {
         updateData.kelas = null;
       }

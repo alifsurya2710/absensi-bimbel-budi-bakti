@@ -95,7 +95,7 @@ export async function POST(req: Request) {
         phone: cleanPhone,
         password: hashedPassword,
         role: role as Role,
-        kelas: role === "MURID" && kelas ? String(kelas).trim() : null,
+        kelas: (role === "MURID" || role === "GURU") && kelas ? String(kelas).trim() : null,
         image: image ? String(image) : null, // Foto profil opsional (Base64 data URL)
       },
     });

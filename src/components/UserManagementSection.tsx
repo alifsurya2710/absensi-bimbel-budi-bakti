@@ -404,7 +404,7 @@ export default function UserManagementSection({ initialUsers, currentUserRole = 
               <tr>
                 <th className="px-6 py-3.5">Nama & Username</th>
                 <th className="px-6 py-3.5">Peran (Role)</th>
-                <th className="px-6 py-3.5">Asal Sekolah</th>
+                <th className="px-6 py-3.5">Asal Sekolah / Mapel</th>
                 <th className="px-6 py-3.5">Kontak</th>
                 <th className="px-6 py-3.5 text-center">Total Pengisian Presensi</th>
                 <th className="px-6 py-3.5 text-right">Aksi</th>
@@ -477,7 +477,13 @@ export default function UserManagementSection({ initialUsers, currentUserRole = 
                     </td>
                     <td className="px-6 py-3.5">
                       <span className="font-semibold text-slate-700">
-                        {u.role === "ADMIN" ? "Administrator" : u.role === "MURID" ? u.kelas || "-" : "Tenaga Pengajar"}
+                        {u.role === "ADMIN"
+                          ? "Administrator"
+                          : u.role === "MURID"
+                          ? u.kelas || "-"
+                          : u.kelas
+                          ? `Mapel: ${u.kelas}`
+                          : "Tenaga Pengajar"}
                       </span>
                     </td>
                     <td className="px-6 py-3.5">
@@ -684,6 +690,18 @@ export default function UserManagementSection({ initialUsers, currentUserRole = 
                       value={formData.kelas}
                       onChange={(e) => setFormData({ ...formData, kelas: e.target.value })}
                       placeholder="Contoh: SMA Negeri 1 Jakarta"
+                      className="w-full px-3.5 py-2.5 text-xs text-slate-900 bg-white placeholder:text-slate-400 font-medium rounded-xl border border-slate-300 focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
+                    />
+                  </div>
+                )}
+                {formData.role === "GURU" && (
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">Mata Pelajaran:</label>
+                    <input
+                      type="text"
+                      value={formData.kelas}
+                      onChange={(e) => setFormData({ ...formData, kelas: e.target.value })}
+                      placeholder="Contoh: Matematika, Fisika, dll."
                       className="w-full px-3.5 py-2.5 text-xs text-slate-900 bg-white placeholder:text-slate-400 font-medium rounded-xl border border-slate-300 focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
                     />
                   </div>

@@ -117,7 +117,7 @@ export async function POST(req: Request) {
         phone: phone ? phone.trim() : null,
         password: hashedPassword,
         role: role as Role,
-        kelas: role === "MURID" ? (kelas?.trim() || "XII RPL 1") : null,
+        kelas: (role === "MURID" || role === "GURU") ? (kelas?.trim() || null) : null,
       },
     });
 

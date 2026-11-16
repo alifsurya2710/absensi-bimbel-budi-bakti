@@ -281,7 +281,13 @@ export default function AdminAttendanceApprovalTable({ initialAttendances, users
                   <td className="px-6 py-3.5">
                     <p className="font-bold text-slate-800">{att.user.name}</p>
                     <p className="text-[11px] text-slate-400">
-                      {att.user.role} {att.user.kelas ? `• ${att.user.kelas}` : ""} • @{att.user.username || "-"}
+                      {att.user.role}{" "}
+                      {att.user.kelas
+                        ? att.user.role === "GURU"
+                          ? `• Mapel: ${att.user.kelas}`
+                          : `• ${att.user.kelas}`
+                        : ""}{" "}
+                      • @{att.user.username || "-"}
                     </p>
                   </td>
                   <td className="px-6 py-3.5">
