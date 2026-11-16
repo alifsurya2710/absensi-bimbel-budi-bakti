@@ -25,6 +25,7 @@ import {
   Users2,
   Bell,
   Sparkles,
+  Eye,
 } from "lucide-react";
 import EditProfileModal from "@/components/EditProfileModal";
 import Interactive3DBackground from "@/components/Interactive3DBackground";
@@ -87,6 +88,7 @@ export default function AttendanceClient({
   const [mobileView, setMobileView] = useState<"home" | "riwayat" | "orangtua">("home");
   const [mobileShowCamera, setMobileShowCamera] = useState(false);
   const [showDuplicateConfirm, setShowDuplicateConfirm] = useState(false);
+  const [selectedPhotoPreview, setSelectedPhotoPreview] = useState<string | null>(null);
   const [deletingItemId, setDeletingItemId] = useState<string | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [isPushBannerVisible, setIsPushBannerVisible] = useState(false);
@@ -470,12 +472,22 @@ export default function AttendanceClient({
                           </span>
                         )}
                         {item.photo && (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={item.photo}
-                            alt="Bukti"
-                            className="w-9 h-9 rounded-lg object-cover border border-slate-200 shadow-sm"
-                          />
+                          <button
+                            type="button"
+                            onClick={() => setSelectedPhotoPreview(item.photo || null)}
+                            className="group relative block w-9 h-9 rounded-lg overflow-hidden border border-emerald-200 hover:border-emerald-600 transition shadow-2xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                            title="Klik untuk melihat foto / bukti"
+                          >
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={item.photo}
+                              alt="Bukti"
+                              className="w-full h-full object-cover group-hover:scale-110 transition duration-200"
+                            />
+                            <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white">
+                              <Eye className="w-3.5 h-3.5" />
+                            </div>
+                          </button>
                         )}
                       </div>
                       {/* Keterangan */}
@@ -931,12 +943,22 @@ export default function AttendanceClient({
                       </td>
                       <td className="px-6 py-3.5">
                         {item.photo ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={item.photo}
-                            alt="Bukti Kehadiran"
-                            className="w-10 h-10 rounded-lg object-cover border border-slate-200 shadow-2xs"
-                          />
+                          <button
+                            type="button"
+                            onClick={() => setSelectedPhotoPreview(item.photo || null)}
+                            className="group relative block w-11 h-11 rounded-xl overflow-hidden border-2 border-emerald-200 hover:border-emerald-600 transition shadow-xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                            title="Klik untuk melihat foto / bukti"
+                          >
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={item.photo}
+                              alt="Bukti Kehadiran"
+                              className="w-full h-full object-cover group-hover:scale-110 transition duration-200"
+                            />
+                            <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white">
+                              <Eye className="w-4 h-4" />
+                            </div>
+                          </button>
                         ) : (
                           <span className="text-slate-400 italic text-[11px]">Tidak ada</span>
                         )}
@@ -1355,6 +1377,47 @@ export default function AttendanceClient({
                   <Sparkles className="w-3.5 h-3.5" />
                 )}
                 <span>Aktifkan</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Modal Lightbox Preview Foto Bukti Presensi */}
+      {selectedPhotoPreview && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-xs p-4 animate-in fade-in duration-150"
+          onClick={() => setSelectedPhotoPreview(null)}
+        >
+          <div
+            className="relative max-w-lg w-full bg-slate-900 rounded-3xl overflow-hidden p-3 shadow-2xl border border-white/10 animate-in zoom-in-95 duration-150"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between pb-2 px-2 text-white">
+              <span className="text-xs font-bold flex items-center gap-1.5 text-emerald-400">
+                <CheckCircle2 className="w-4 h-4" /> Bukti Foto Presensi
+              </span>
+              <button
+                type="button"
+                onClick={() => setSelectedPhotoPreview(null)}
+                className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition"
+                aria-label="Tutup preview"
+              >
+                <XCircle className="w-5 h-5" />
+              </button>
+            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={selectedPhotoPreview}
+              alt="Bukti Kehadiran Full"
+              className="w-full h-auto max-h-[75vh] object-contain rounded-2xl bg-black/50"
+            />
+            <div className="pt-3 text-center">
+              <button
+                type="button"
+                onClick={() => setSelectedPhotoPreview(null)}
+                className="px-5 py-2 rounded-xl bg-white/20 hover:bg-white/30 text-white text-xs font-bold transition shadow-xs"
+              >
+                Tutup Preview
               </button>
             </div>
           </div>
