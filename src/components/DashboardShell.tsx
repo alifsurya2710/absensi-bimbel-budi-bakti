@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import AttendanceNotificationBell from "@/components/AttendanceNotificationBell";
 import EditProfileModal from "@/components/EditProfileModal";
+import FullscreenLoader from "@/components/LoginLoadingScreen";
 import {
   Users,
   LogOut,
@@ -46,6 +47,14 @@ export default function DashboardShell({
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [showLogoutLoader, setShowLogoutLoader] = useState(false);
+
+  const handleLogout = () => {
+    setShowLogoutLoader(true);
+    setTimeout(() => {
+      signOut({ callbackUrl: "/login" });
+    }, 1800);
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -103,6 +112,8 @@ export default function DashboardShell({
 
   return (
     <div className={`min-h-screen font-sans flex flex-col lg:flex-row transition-colors duration-200 ${isDarkMode ? "dark-theme bg-slate-950 text-slate-100" : "bg-slate-50 text-slate-800"}`}>
+      {/* Logout Loading Screen */}
+      <FullscreenLoader visible={showLogoutLoader} mode="logout" />
       {/* Mobile Top App Bar */}
       <header className={`lg:hidden sticky top-0 z-30 px-4 h-16 flex items-center justify-between shadow-xs border-b transition-colors ${isDarkMode ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200"}`}>
         <div className="flex items-center gap-2.5">
@@ -258,7 +269,7 @@ export default function DashboardShell({
         <div className={`p-4 border-t ${isDarkMode ? "border-slate-800" : "border-slate-100"}`}>
           <button
             type="button"
-            onClick={() => signOut({ callbackUrl: "/login" })}
+            onClick={handleLogout}
             className={`w-full flex items-center gap-2.5 px-4 py-2.5 rounded-lg text-sm font-medium transition ${isDarkMode ? "text-rose-400 hover:bg-rose-950/40 hover:text-rose-300" : "text-red-600 hover:bg-red-50 hover:text-red-700"}`}
           >
             <LogOut className="w-4 h-4" />

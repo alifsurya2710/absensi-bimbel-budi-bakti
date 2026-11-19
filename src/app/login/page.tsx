@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import Interactive3DBackground from "@/components/Interactive3DBackground";
 import MathCaptcha from "@/components/MathCaptcha";
+import FullscreenLoader from "@/components/LoginLoadingScreen";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -26,6 +27,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showLoginLoader, setShowLoginLoader] = useState(false);
 
   // Captcha Matematika
   const [captchaAnswer, setCaptchaAnswer] = useState("");
@@ -128,8 +130,12 @@ export default function LoginPage() {
         // Login berhasil: bersihkan status lockout & attempts
         localStorage.removeItem("login_lockout_until");
         localStorage.removeItem("login_failed_attempts");
-        router.push("/dashboard");
-        router.refresh();
+        // Tampilkan loading screen animasi sebelum redirect ke dashboard
+        setShowLoginLoader(true);
+        setTimeout(() => {
+          router.push("/dashboard");
+          router.refresh();
+        }, 2000);
       }
     } catch {
       setError("Terjadi kendala koneksi ke server.");
@@ -145,6 +151,9 @@ export default function LoginPage() {
 
   return (
     <div className="relative flex min-h-screen bg-gradient-to-b from-emerald-50/70 via-white to-green-50/60 font-sans overflow-hidden">
+      {/* Loading Screen setelah login berhasil */}
+      <FullscreenLoader visible={showLoginLoader} mode="login" />
+
       {/* 3D Background */}
       <Interactive3DBackground />
 

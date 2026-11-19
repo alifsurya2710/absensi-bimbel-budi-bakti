@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import Image from "next/image";
+import FullscreenLoader from "@/components/LoginLoadingScreen";
 import {
   Camera,
   CheckCircle2,
@@ -212,7 +213,17 @@ export default function AttendanceClient({
 
   // Kamera Langsung (Webcam)
   const [isCameraActive, setIsCameraActive] = useState(false);
+  const [isMirrored, setIsMirrored] = useState(true); // Default: cermin aktif (selfie-friendly)
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Logout dengan loading screen
+  const [showLogoutLoader, setShowLogoutLoader] = useState(false);
+  const handleLogout = () => {
+    setShowLogoutLoader(true);
+    setTimeout(() => {
+      signOut({ callbackUrl: "/login" });
+    }, 1800);
+  };
 
   const isPhotoRequired = status === "HADIR" || status === "IZIN" || status === "SAKIT";
 
@@ -257,6 +268,11 @@ export default function AttendanceClient({
     canvas.height = videoRef.current.videoHeight || 480;
     const ctx = canvas.getContext("2d");
     if (ctx) {
+      if (isMirrored) {
+        // Flip horizontal agar foto hasil sesuai tampilan cermin
+        ctx.translate(canvas.width, 0);
+        ctx.scale(-1, 1);
+      }
       ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
       const dataUrl = canvas.toDataURL("image/jpeg", 0.8);
       setPhoto(dataUrl);
@@ -345,6 +361,9 @@ export default function AttendanceClient({
 
   return (
     <div className="relative min-h-screen bg-gradient-to-b from-sky-50 via-white to-sky-100/60 text-slate-800 font-sans pb-20 sm:pb-16 overflow-hidden">
+      {/* Fullscreen Logout Loader */}
+      <FullscreenLoader visible={showLogoutLoader} mode="logout" />
+
       {/* 3D Animated Background */}
       <Interactive3DBackground />
 
@@ -378,7 +397,7 @@ export default function AttendanceClient({
             </button>
 
             <button
-              onClick={() => signOut({ callbackUrl: "/login" })}
+              onClick={handleLogout}
               className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-rose-200 bg-rose-50 hover:bg-rose-100 text-xs font-semibold text-rose-600 transition"
             >
               <LogOut className="w-3.5 h-3.5" /> <span>Keluar</span>
@@ -760,7 +779,28 @@ export default function AttendanceClient({
                           autoPlay
                           playsInline
                           className="w-full h-full object-cover"
+                          style={{ transform: isMirrored ? "scaleX(-1)" : "scaleX(1)" }}
                         />
+                        {/* Tombol Cermin (pojok kanan atas) */}
+                        <button
+                          type="button"
+                          onClick={() => setIsMirrored((prev) => !prev)}
+                          title={isMirrored ? "Matikan Cermin" : "Aktifkan Cermin"}
+                          className={`absolute top-2 right-2 w-9 h-9 flex items-center justify-center rounded-full shadow-lg border-2 transition-all ${
+                            isMirrored
+                              ? "bg-emerald-600 border-emerald-400 text-white"
+                              : "bg-white/80 border-slate-300 text-slate-600"
+                          }`}
+                        >
+                          {/* Ikon cermin SVG */}
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                            <path d="M12 3v18" />
+                            <path d="M5 7l-2 5 2 5" />
+                            <path d="M19 7l2 5-2 5" />
+                            <path d="M3 12h4" />
+                            <path d="M17 12h4" />
+                          </svg>
+                        </button>
                         <div className="absolute bottom-3 inset-x-0 flex justify-center gap-3">
                           <button
                             type="button"
@@ -1231,7 +1271,7 @@ export default function AttendanceClient({
           {/* 5. Keluar */}
           <button
             type="button"
-            onClick={() => signOut({ callbackUrl: "/login" })}
+            onClick={handleLogout}
             className="flex flex-col items-center gap-1 py-1 px-2.5 rounded-2xl text-rose-500 hover:text-rose-600 transition"
           >
             <LogOut className="w-5 h-5 stroke-[1.8]" />
